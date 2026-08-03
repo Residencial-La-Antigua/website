@@ -22,11 +22,6 @@ El conjunto de funcionalidades se ha organizado en 7 módulos funcionales:
 | **Eventos y Programación**                   | Calendario anual (eventos únicos y recurrentes)                                                                                  |
 | **Donaciones y Recursos**                    | Donaciones (dinero o plantas), lista de deseos de donaciones                                                                     |
 
-## Tecnología (Tech Stack)
-
-- **Backend:** Django
-- Base de datos, hospedaje y despliegue: por decidir conforme avance el desarrollo
-
 ## Cómo contribuir
 
 - El seguimiento y priorización de funcionalidades se realiza en el [tablero de GitHub Project](https://github.com/orgs/Residencial-La-Antigua/projects/1).
