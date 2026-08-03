@@ -8,6 +8,17 @@ docker compose up --build
 
 El sitio quedará disponible en http://localhost:8000.
 
+## Migraciones
+
+- `docker compose up` ejecuta `migrate` automáticamente al iniciar el contenedor, así que las migraciones existentes se aplican solas.
+- Si corres el proyecto directo en el host (`uv run manage.py runserver`, sin Docker), `migrate` no es automático: hay que correrlo a mano después de traer cambios que incluyan migraciones nuevas.
+- `makemigrations` nunca es automático. Cada vez que se modifique un modelo hay que generar el archivo de migración a mano y commitearlo:
+
+```bash
+uv run manage.py makemigrations
+uv run manage.py migrate
+```
+
 ## Autenticación
 
 Las cuentas de vecinos se registran en `/accounts/signup/` pero quedan inactivas (`is_active=False`) hasta que un administrador las aprueba desde `/admin/` (acción "Aprobar cuentas seleccionadas" sobre el modelo Usuario).
