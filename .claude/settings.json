@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(curl -s http://localhost:8001/admin/login/)",
-      "Bash(curl -s http://localhost:8001/accounts/signup/)"
+      "Bash(curl -s http://localhost:8001/accounts/signup/)",
+      "Bash(git rm *)"
     ]
   }
 }
