@@ -1,18 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="card">
 {% if user.is_authenticated %}
-<p>
-    Hola, {{ user.username }}. <a href="{% url 'profile' %}">Mi cuenta</a>.
-    <form method="post" action="{% url 'logout' %}" style="display: inline">
-        {% csrf_token %}
-        <button type="submit">Cerrar sesión</button>
-    </form>
-</p>
+    <h1>Bienvenido, {{ user.username }}</h1>
+    <p>Este es el punto de partida de la plataforma comunitaria de Residencial La Antigua.</p>
 {% else %}
-<p>
-    <a href="{% url 'login' %}">Iniciar sesión</a> |
-    <a href="{% url 'signup' %}">Registrarse</a>
-</p>
+    <h1>Bienvenido</h1>
+    <p>Únete a la plataforma comunitaria de Residencial La Antigua para coordinar cuadrillas, eventos y más.</p>
+    <a href="{% url 'signup' %}" class="btn">Registrarse</a>
 {% endif %}
+</div>
 {% endblock %}

@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(DJANGO_SUPERUSER_PASSWORD=Test1234! uv run manage.py createsuperuser --username testadmin --email testadmin@example.com --noinput)",
       "Bash(curl -s http://localhost:8001/admin/login/)",
       "Bash(curl -s http://localhost:8001/accounts/signup/)",
       "Bash(git rm *)",
@@ -10,7 +11,22 @@
       "Bash(echo \"db.sqlite3\")",
       "Bash(git --version)",
       "Bash(echo \"exit no-index: $?\")",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(uv run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8001/static/css/main.css)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8001/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8001/accounts/login/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8001/accounts/signup/)",
+      "Bash(chromium-cli --session laantigua)",
+      "Bash(python3 -c \"import playwright\")",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx --yes playwright install chromium --with-deps)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node screenshot.mjs)",
+      "Bash(node screenshot2.mjs)",
+      "Bash(curl -s -o /dev/null -w \"home: %{http_code}\\\\n\" http://localhost:8000/)",
+      "Bash(curl -s -o /dev/null -w \"css: %{http_code}\\\\n\" http://localhost:8000/static/css/main.css)"
     ]
   }
 }
