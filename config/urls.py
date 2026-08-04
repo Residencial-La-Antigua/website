@@ -28,4 +28,9 @@ urlpatterns = [
         TemplateView.as_view(template_name="telefonos-importantes.html"),
         name="telefonos-importantes",
     ),
+    path(
+        "informacion/basura-y-reciclaje/",
+        TemplateView.as_view(template_name="basura-y-reciclaje.html"),
+        name="basura-y-reciclaje",
+    ),
 ]
