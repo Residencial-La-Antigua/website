@@ -13,13 +13,14 @@
     />
     <link rel="stylesheet" href="{% static 'css/reset.css' %}" />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    {% block extra_css %}{% endblock %}
   </head>
   <body>
     <header class="site-header">
       <a href="{% url 'home' %}" class="brand">Residencial La Antigua</a>
       <nav class="site-nav">
         {% if user.is_authenticated %}
-        <span class="greeting">Hola, {{ user.first_name }}</span>
+        <span class="greeting">Hola, {{ user.username }}</span>
         <a href="{% url 'profile' %}">Mi cuenta</a>
         <form method="post" action="{% url 'logout' %}" style="display: inline">
           {% csrf_token %}

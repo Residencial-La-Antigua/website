@@ -1,0 +1,185 @@
+/* Shared styles for the /informacion/ section */
+
+.info-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background-color: white;
+  border-radius: var(--radius);
+}
+
+.info-page h1 {
+  margin: 0 0 2rem;
+  font-weight: 600;
+  font-size: 1.8rem;
+}
+
+.info-section {
+  margin-bottom: 2.5rem;
+}
+
+.info-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.card-grid--wide {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Emergency cards: 911 / Cruz Roja / Fuerza Pública */
+
+.phone-card {
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.phone-card:hover {
+  transform: scale(1.1);
+}
+
+.phone-card--danger {
+  background: #fcebeb;
+}
+
+.card-icon {
+  display: inline-block;
+  margin-right: 0.35rem;
+}
+
+.phone-card__label {
+  font-size: 1rem;
+  color: #791f1f;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.phone-card__detail {
+  font-size: 0.8rem;
+  color: #791f1f;
+  margin: 0.35rem 0;
+  display: block;
+}
+
+.phone-card__number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #791f1f;
+  text-decoration: none;
+}
+
+.phone-card__number:hover,
+.phone-card__number:focus {
+  color: #791f1f;
+}
+
+/* Servicios públicos / Denuncias anónimas cards */
+
+.info-card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.info-card:hover {
+  transform: scale(1.05);
+}
+
+.info-card--wide {
+  padding: 1.25rem 1.5rem;
+}
+
+.info-card__title {
+  font-size: 1rem;
+  margin: 0 0 0.6rem;
+}
+
+.info-card__detail {
+  font-size: 0.8rem;
+  margin: 0.35rem 0;
+  display: block;
+}
+
+.info-card__number {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  text-decoration: none;
+  margin: 0 0 0.25rem;
+}
+
+.info-card__number:hover,
+.info-card__number:focus {
+  text-decoration: underline;
+}
+
+.info-card__number a,
+.info-card__number > a {
+  color: #111;
+  text-decoration: none;
+}
+
+.info-card__number a:hover,
+.info-card__number a:focus {
+  text-decoration: underline;
+}
+
+.info-card__meta {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.info-card__link {
+  font-size: 0.85rem;
+  color: #185fa5;
+  text-decoration: none;
+}
+
+.info-card__link:hover,
+.info-card__link:focus {
+  color: #185fa5;
+  text-decoration: underline;
+}
+
+.info-card__list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  list-style-type: disc;
+}
+
+.info-card__phone-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem;
+}
+
+.info-card__phone-list a {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  text-decoration: none;
+}
+
+.info-card__phone-list a:hover,
+.info-card__phone-list a:focus {
+  color: #111;
+  text-decoration: underline;
+}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Teléfonos importantes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/informacion.css' %}" />
+{% endblock %}
+
+{% block content %}
+<article class="info-page">
+  <h1>Teléfonos Importantes</h1>
+
+  <section class="info-section" aria-labelledby="emergencias-heading">
+    <h2 id="emergencias-heading">Emergencias</h2>
+    <div class="card-grid">
+
+      <div class="phone-card phone-card--danger">
+        <h3 class="phone-card__label"><span class="card-icon" aria-hidden="true">🚨</span> Emergencias</h3>
+        <i class="phone-card__detail">Policía, bomberos, ambulancia</i>
+        <a class="phone-card__number" href="tel:911">911</a>
+      </div>
+
+      <div class="phone-card phone-card--danger">
+        <h3 class="phone-card__label"><span class="card-icon" aria-hidden="true">🚑</span> Cruz Roja</h3>
+        <i class="phone-card__detail">Ambulancia directa</i>
+        <a class="phone-card__number" href="tel:128">128</a>
+      </div>
+
+      <div class="phone-card phone-card--danger">
+        <h3 class="phone-card__label"><span class="card-icon" aria-hidden="true">🚓</span> Fuerza Pública</h3>
+        <i class="phone-card__detail">Directa</i>
+        <a class="phone-card__number" href="tel:117">117</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="info-section" aria-labelledby="servicios-heading">
+    <h2 id="servicios-heading">Servicios públicos</h2>
+    <div class="card-grid">
+
+      <div class="info-card">
+        <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">🏛️</span> Municipalidad de La Unión</h3>
+        <a class="info-card__number" href="tel:22745000">2274-5000</a>
+        <p class="info-card__meta">Lunes a viernes, 7:00 a.m. a 3:30 p.m.</p>
+        <p><a class="info-card__link" href="https://launion.go.cr/tramites-pagos-en-linea/" target="_blank" rel="noopener">
+          Pagos en línea
+        </a></p>
+        <p><a class="info-card__link" href="https://digital.launion.go.cr/jpcloud/" target="_blank" rel="noopener">
+          Trámites La Unión Digital
+        </a></p>
+        <p><a class="info-card__link" href="https://www.facebook.com/municipalidadlaunion" target="_blank" rel="noopener">
+          <span class="card-icon" aria-hidden="true">📘</span> Facebook
+        </a></p>
+      </div>
+
+      <div class="info-card">
+        <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">⚡</span> CNFL</h3>
+        <i class="info-card__detail">Cortes de electricidad</i>
+        <a class="info-card__number" href="tel:1026">1026</a>
+        <a class="info-card__number" href="tel:8003637442">800-363-7442</a>
+        <a class="info-card__link" href="https://www.cnfl.go.cr/averias/averias-servicio-electrico" target="_blank" rel="noopener">
+          https://www.cnfl.go.cr/averias
+        </a>
+      </div>
+
+      <div class="info-card">
+        <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">💧</span> AyA</h3>
+        <i class="info-card__detail">Cortes o fugas de agua</i>
+        <a class="info-card__number" href="tel:8007376783">800-737-6783</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="info-section" aria-labelledby="denuncias-heading">
+    <h2 id="denuncias-heading">Denuncias anónimas</h2>
+    <div class="card-grid card-grid--wide">
+
+      <div class="info-card info-card--wide">
+        <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">👮‍♂️</span> Policía Municipal de La Unión</h3>
+        <p class="info-card__meta">Llamadas anónimas y confidenciales sobre:</p>
+        <ul class="info-card__list">
+          <li>Alteración al orden público</li>
+          <li>Consumo de alcohol o sustancias prohibidas en vía pública</li>
+          <li>Ventas ambulantes</li>
+          <li>Violencia doméstica</li>
+          <li>Construcciones ilegales</li>
+          <li>Incendios</li>
+          <li>Accidentes de tránsito, entre otros</li>
+        </ul>
+        <div class="info-card__phone-list">
+          <a href="tel:22745201">2274-5201</a>
+          <a href="tel:22745202">2274-5202</a>
+          <a href="tel:22745204">2274-5204</a>
+          <a href="tel:22745205">2274-5205</a>
+        </div>
+      </div>
+
+      <div class="info-card info-card--wide">
+        <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">🕵️</span> OIJ &mdash; Línea confidencial</h3>
+        <p class="info-card__meta">Para dar información sobre delitos, de forma anónima y gratuita.</p>
+        <a class="info-card__number" href="tel:8000008645">800-8000-645</a>
+      </div>
+
+    </div>
+  </section>
+</article>
+{% endblock %}

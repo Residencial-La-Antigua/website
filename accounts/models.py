@@ -21,7 +21,9 @@ class User(AbstractUser):
         help_text="Unapproved neighbor accounts stay inactive and cannot log in.",
     )
     street = models.CharField("calle", max_length=200)
-    house_number = models.CharField("número de casa (+ apartamento, si aplica)", max_length=20)
+    house_number = models.CharField(
+        "número de casa (+ apartamento, si aplica)", max_length=20
+    )
     phone_number = models.CharField(
         "número de teléfono", max_length=20, blank=True
     )
