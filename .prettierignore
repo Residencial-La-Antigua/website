@@ -1,0 +1,5 @@
+# Django templates use {% %} tags that Prettier's plain HTML parser
+# doesn't understand. It will wrap long tags across lines, which breaks
+# Django's template parser.
+templates/**/*.html
+accounts/templates/**/*.html
