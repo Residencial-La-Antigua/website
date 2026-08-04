@@ -9,13 +9,20 @@ class UserAdmin(BaseUserAdmin):
     list_display = (
         "username",
         "email",
-        "first_name",
-        "last_name",
+        "street",
+        "house_number",
         "is_active",
         "is_staff",
     )
     list_filter = ("is_active", "is_staff")
     actions = ("approve_users",)
+
+    fieldsets = BaseUserAdmin.fieldsets + (
+        (
+            "Dirección y contacto",
+            {"fields": ("street", "house_number", "phone_number")},
+        ),
+    )
 
     @admin.action(description="Aprobar cuentas seleccionadas")
     def approve_users(self, request, queryset):
