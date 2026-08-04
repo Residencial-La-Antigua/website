@@ -35,6 +35,17 @@ uv run manage.py createsuperuser
 docker compose exec web uv run manage.py createsuperuser
 ```
 
+## Formato de código
+
+- **Python:** [Ruff](https://docs.astral.sh/ruff/) (instalado como dependencia de desarrollo). Corre:
+
+  ```bash
+  uv run ruff format .
+  uv run ruff check .
+  ```
+
+- **HTML/CSS/JS:** [Prettier](https://prettier.io/). El repo trae `.prettierrc` con la configuración compartida; basta con tener la extensión de Prettier del editor activada (o correr `npx prettier --write .` si prefieres la CLI). Por ahora esto no está forzado automáticamente (sin pre-commit hook ni CI) — depende de que cada quien lo corra o tenga formato-al-guardar activado.
+
 ## Tecnología (Tech Stack)
 
 - **Backend:** Django

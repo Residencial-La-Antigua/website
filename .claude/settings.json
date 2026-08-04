@@ -26,7 +26,8 @@
       "Bash(node screenshot.mjs)",
       "Bash(node screenshot2.mjs)",
       "Bash(curl -s -o /dev/null -w \"home: %{http_code}\\\\n\" http://localhost:8000/)",
-      "Bash(curl -s -o /dev/null -w \"css: %{http_code}\\\\n\" http://localhost:8000/static/css/main.css)"
+      "Bash(curl -s -o /dev/null -w \"css: %{http_code}\\\\n\" http://localhost:8000/static/css/main.css)",
+      "Bash(uv add *)"
     ]
   }
 }
