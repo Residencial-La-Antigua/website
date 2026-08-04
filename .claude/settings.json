@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(DJANGO_SUPERUSER_PASSWORD=Test1234! uv run manage.py createsuperuser --username testadmin --email testadmin@example.com --noinput)"
+      "Bash(curl -s http://localhost:8001/admin/login/)",
+      "Bash(curl -s http://localhost:8001/accounts/signup/)"
     ]
   }
 }
