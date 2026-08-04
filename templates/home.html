@@ -1,4 +1,24 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="hero-masonry" aria-hidden="true">
+  <img src="{% static 'images/tiles/tile-01.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-02.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-03.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-04.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-05.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-06.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-07.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-08.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-09.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-10.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-11.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-12.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-13.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-14.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-15.jpg' %}" alt="" />
+  <img src="{% static 'images/tiles/tile-16.jpg' %}" alt="" />
+</div>
+<div class="hero-overlay"></div>
+
 <div class="card">
   {% if user.is_authenticated %}
   <h1>Bienvenido, {{ user.username }}</h1>

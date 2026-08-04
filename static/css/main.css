@@ -24,6 +24,8 @@
 
 body {
   margin: 0;
+  position: relative;
+  min-height: 100vh;
   font-family: var(--font-sans);
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -41,6 +43,8 @@ a:hover {
 /* Header */
 
 .site-header {
+  position: relative;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -76,12 +80,76 @@ a:hover {
 /* Layout */
 
 .container {
-  max-width: 720px;
+  position: relative;
+  max-width: 100vw;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+}
+
+/* Decorative masonry background (home page) */
+
+.container:has(.hero-masonry) {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+body:has(.hero-masonry) footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+}
+
+.hero-masonry {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  columns: 6 260px;
+  column-gap: 8px;
+  z-index: 0;
+  pointer-events: none;
+  top: 5.4rem;
+  width: 108vw;
+  left: -4vw;
+  height: 108vh;
+}
+
+@media (max-width: 768px) {
+  .hero-masonry {
+    columns: 4 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-masonry {
+    columns: 3 90px;
+  }
+}
+
+.hero-masonry img {
+  width: 100%;
+  display: block;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  break-inside: avoid;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-bg);
+  opacity: 0.85;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .card {
+  position: relative;
+  z-index: 2;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
