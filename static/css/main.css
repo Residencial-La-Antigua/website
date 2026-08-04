@@ -18,12 +18,7 @@
     'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
   position: relative;
   min-height: 100vh;
   font-family: var(--font-sans);
@@ -159,6 +154,9 @@ body:has(.hero-masonry) footer {
 }
 
 .card.signup ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
   color: var(--color-text-muted);
 }
 
@@ -168,10 +166,20 @@ body:has(.hero-masonry) footer {
 
 .card h1 {
   margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .card h1.signed-in {
   font-size: 1.6rem;
+}
+
+.card h2 {
+  margin-bottom: 0.75rem;
+}
+
+.card > p {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 footer {
