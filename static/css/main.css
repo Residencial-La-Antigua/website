@@ -158,9 +158,12 @@ body:has(.hero-masonry) footer {
   margin: 0 auto;
 }
 
+.card.signup ul {
+  color: var(--color-text-muted);
+}
+
 .card.signup ul li {
   font-size: 0.875rem;
-  color: var(--color-text-muted);
 }
 
 .card h1 {
@@ -258,7 +261,8 @@ form .helptext {
   color: var(--color-text-muted);
 }
 
-.errorlist {
+.errorlist,
+.card.signup ul.errorlist {
   list-style: none;
   margin: 0.35rem 0 0;
   padding: 0;
