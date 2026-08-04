@@ -3,7 +3,14 @@
     "allow": [
       "Bash(curl -s http://localhost:8001/admin/login/)",
       "Bash(curl -s http://localhost:8001/accounts/signup/)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git check-ignore *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(xxd)",
+      "Bash(echo \"db.sqlite3\")",
+      "Bash(git --version)",
+      "Bash(echo \"exit no-index: $?\")",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

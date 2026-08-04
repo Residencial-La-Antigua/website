@@ -3,7 +3,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 <p>
-    Hola, {{ user.username }}.
+    Hola, {{ user.username }}. <a href="{% url 'profile' %}">Mi cuenta</a>.
     <form method="post" action="{% url 'logout' %}" style="display: inline">
         {% csrf_token %}
         <button type="submit">Cerrar sesión</button>

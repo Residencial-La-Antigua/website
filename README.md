@@ -22,6 +22,10 @@ El conjunto de funcionalidades se ha organizado en 7 módulos funcionales:
 | **Eventos y Programación**                   | Calendario anual (eventos únicos y recurrentes)                                                                                  |
 | **Donaciones y Recursos**                    | Donaciones (dinero o plantas), lista de deseos de donaciones                                                                     |
 
+## Progreso actual
+
+- **Autenticación de vecinos:** registro de cuentas, aprobación por administrador antes de poder iniciar sesión, e inicio/cierre de sesión.
+
 ## Cómo contribuir
 
 - El seguimiento y priorización de funcionalidades se realiza en el [tablero de GitHub Project](https://github.com/orgs/Residencial-La-Antigua/projects/1).
