@@ -1,14 +1,10 @@
-{% extends "base.html" %}
-
-{% block title %}Mi cuenta{% endblock %}
-
+{% extends "base.html" %} {% block title %}Mi cuenta{% endblock %}
 {% block content %}
 <div class="card">
-    <h1>Mi cuenta</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Guardar cambios</button>
-    </form>
+  <h1>Mi cuenta</h1>
+  <form method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn">Guardar cambios</button>
+  </form>
 </div>
 {% endblock %}

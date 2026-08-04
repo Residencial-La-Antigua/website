@@ -18,7 +18,7 @@
       <a href="{% url 'home' %}" class="brand">Residencial La Antigua</a>
       <nav class="site-nav">
         {% if user.is_authenticated %}
-        <span class="greeting">Hola, {{ user.username }}</span>
+        <span class="greeting">Hola, {{ user.first_name }}</span>
         <a href="{% url 'profile' %}">Mi cuenta</a>
         <form method="post" action="{% url 'logout' %}" style="display: inline">
           {% csrf_token %}

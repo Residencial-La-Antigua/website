@@ -21,7 +21,7 @@
 
 <div class="card">
   {% if user.is_authenticated %}
-  <h1>Bienvenido, {{ user.username }}</h1>
+  <h1 class="signed-in">Bienvenido, {{ user.first_name }}</h1>
   <p>
     Este es el punto de partida de la plataforma comunitaria de Residencial La
     Antigua.
