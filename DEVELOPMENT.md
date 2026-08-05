@@ -55,6 +55,4 @@ docker compose exec web uv run manage.py createsuperuser
 
 ### Antes de producción
 
-- [ ] Mover `SECRET_KEY` a una variable de entorno (actualmente hardcodeada en [config/settings.py](config/settings.py)).
-- [ ] Establecer `DEBUG = False` mediante variable de entorno (actualmente `True` en [config/settings.py](config/settings.py)).
 - [ ] Migrar de SQLite a Postgres (u otra base de datos apta para producción) configurable por variable de entorno (actualmente hardcodeada a SQLite en [config/settings.py](config/settings.py)).
