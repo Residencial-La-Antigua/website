@@ -11,3 +11,13 @@ SECRET_KEY="<clave larga y aleatoria>"
 DEBUG="False"
 ALLOWED_HOSTS="ejemplo.com,www.ejemplo.com"
 ```
+
+## Ejecutar con Docker
+
+`docker-compose.yml` es para desarrollo local. Para producción existe [docker-compose.prod.yml](docker-compose.prod.yml), que corre la app con [Gunicorn](https://gunicorn.org/) en vez del servidor de desarrollo de Django.
+
+```bash
+SECRET_KEY="<clave larga y aleatoria>" \
+ALLOWED_HOSTS="ejemplo.com,www.ejemplo.com" \
+docker compose -f docker-compose.prod.yml up --build
+```

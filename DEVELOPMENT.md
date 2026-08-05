@@ -56,3 +56,5 @@ docker compose exec web uv run manage.py createsuperuser
 ### Antes de producción
 
 - [ ] Migrar de SQLite a Postgres (u otra base de datos apta para producción) configurable por variable de entorno (actualmente hardcodeada a SQLite en [config/settings.py](config/settings.py)).
+- [ ] Configurar `SECURE_HSTS_SECONDS` una vez que el hosting y HTTPS/TLS estén definidos (depende de tener HTTPS confiable en todo el sitio; empezar con un valor corto para probar antes de subir a un año — ver `manage.py check --deploy`).
+- [ ] con `DEBUG=False`, Django deja de servir archivos estáticos automáticamente, y `docker-compose.prod.yml` todavía no tiene una solución para esto (confirmado: `/static/css/main.css` da 404 corriendo así). Hace falta configurar algo como [WhiteNoise](https://whitenoise.readthedocs.io/) (o un servidor/CDN de estáticos aparte) antes de un despliegue real.
