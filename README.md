@@ -25,6 +25,7 @@ El conjunto de funcionalidades se ha organizado en 7 módulos funcionales:
 ## Progreso actual
 
 - **Autenticación de vecinos:** registro de cuentas, aprobación por administrador antes de poder iniciar sesión, e inicio/cierre de sesión.
+- **Información básica:** páginas de referencia con teléfonos importantes, recolección de basura y reciclaje, y desechos no tradicionales.
 
 ## Cómo contribuir
 
