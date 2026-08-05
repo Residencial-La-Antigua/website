@@ -33,4 +33,9 @@ urlpatterns = [
         TemplateView.as_view(template_name="basura-y-reciclaje.html"),
         name="basura-y-reciclaje",
     ),
+    path(
+        "informacion/desechos-no-tradicionales/",
+        TemplateView.as_view(template_name="desechos-no-tradicionales.html"),
+        name="desechos-no-tradicionales",
+    ),
 ]
