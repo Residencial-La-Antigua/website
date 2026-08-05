@@ -4,16 +4,107 @@
 {% block title %}Desechos no tradicionales{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/informacion.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/informacion.css' %}">
 {% endblock %}
 
 {% block content %}
 <article class="info-page">
   <h1>Desechos no tradicionales</h1>
 
-  <section class="info-section" aria-labelledby="desechos-heading">
-    <h2 id="desechos-heading">Desechos no tradicionales</h2>
-    <p><em>Contenido en preparación.</em></p>
+  <section class="waste-section" aria-labelledby="que-es-heading">
+    <h2 id="que-se-acepta-heading">¿Qué se acepta?</h2>
+
+    <div class="compare-grid">
+      <div class="compare-col compare-col--yes">
+        <h3>Sí va</h3>
+        <ul>
+          <li class="waste-item-success">Escombros de construcción o remodelación</li>
+          <li class="waste-item-success">Madera</li>
+          <li class="waste-item-success">Muebles viejos (sillones, camas)</li>
+          <li class="waste-item-success">Colchones</li>
+          <li class="waste-item-success">Televisores y electrodomésticos</li>
+          <li class="waste-item-success">Láminas de zinc</li>
+        </ul>
+      </div>
+      <div class="compare-col compare-col--no">
+        <h3>No va</h3>
+        <ul>
+          <li class="waste-item-fail">Zacate y otros desechos orgánicos
+            &rarr; <a href="/informacion/basura-y-reciclaje/#basura-heading">recolección de basura</a></li>
+          <li class="waste-item-fail">Metal
+            &rarr; <a href="/informacion/basura-y-reciclaje/#reciclaje-ordinario-heading">reciclaje ordinario</a></li>
+          <li class="waste-item-fail">Baterías
+            &rarr; <a href="/informacion/basura-y-reciclaje/#reciclaje-especial-heading">campaña mensual</a></li>
+        </ul>
+      </div>
+    </div>
   </section>
+
+  <section class="waste-section" aria-labelledby="como-solicitarlo-heading">
+    <h2 id="que-se-acepta-heading">¿Cómo desecharlos?</h2>
+    <p>
+      La recolección de desechos no tradicionales se realiza a través de la
+      Municipalidad de La Unión. Para solicitar la recolección, debe enviar
+      una solicitud a través de la plataforma digital de la Municipalidad.
+    </p>
+    <ol class="steps-list">
+      <li>
+        Ingrese a
+        <a href="https://digital.launion.go.cr/jpcloud/" target="_blank" rel="noopener">Trámites La Unión Digital</a>
+        y cree su usuario.
+        <img
+          class="step-screenshot"
+          src="{% static 'images/informacion/desechos-no-tradicionales/paso-1.png' %}"
+          alt="Pantalla de acceso a La Unión Digital, con el enlace &ldquo;¿No tiene usuario? Regístrese&rdquo; resaltado">
+      </li>
+      <li>
+        Inicie sesión y seleccione <strong>&ldquo;Nueva denuncia, queja o solicitud&rdquo;</strong>.
+        <img
+          class="step-screenshot"
+          src="{% static 'images/informacion/desechos-no-tradicionales/paso-2.png' %}"
+          alt="Pantalla de inicio de La Unión Digital, con el botón &ldquo;nueva denuncia, queja o solicitud&rdquo; resaltado">
+      </li>
+      <li>
+        Escoja <strong>&ldquo;Solicitud&rdquo;</strong>.
+        <img
+          class="step-screenshot"
+          src="{% static 'images/informacion/desechos-no-tradicionales/paso-3.png' %}"
+          alt="Formulario de Añadir Denuncia, con la opción &ldquo;Solicitudes&rdquo; resaltada en el menú desplegable de Tipo">
+      </li>
+      <li>
+        Busque y seleccione <strong>&ldquo;Gestión Ambiental &mdash; Recolección de residuos no tradicionales&rdquo;</strong>.
+        <img
+          class="step-screenshot"
+          src="{% static 'images/informacion/desechos-no-tradicionales/paso-4.png' %}"
+          alt="Lista de categorías de Gestión Ambiental, con &ldquo;Recolección de residuos no tradicionales&rdquo; resaltada">
+      </li>
+      <li>
+        Complete el formulario, indicando su número de contribuyente o número
+        de finca de la propiedad, y confirme que está al día con los
+        tributos municipales.
+        <img
+          class="step-screenshot"
+          src="{% static 'images/informacion/desechos-no-tradicionales/paso-5.png' %}"
+          alt="Formulario completo con los campos Tipo, Categoría, Distrito, Ubicación y Detalle">
+      </li>
+      <li>
+        Envíe la solicitud y espere la confirmación de la Municipalidad, que le
+        indicará el día de recolección.
+      </li>
+    </ol>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <p class="stat-card__label">Costo</p>
+        <p class="stat-card__value">Gratuito</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Tiempo de respuesta</p>
+        <p class="stat-card__value">1&ndash;2 semanas</p>
+      </div>
+    </div>
+
+  </section>
+
 </article>
 {% endblock %}
