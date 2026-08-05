@@ -54,6 +54,7 @@ a:hover {
   font-size: 1.4rem;
   color: var(--color-primary);
   text-decoration: none;
+  font-weight: 600;
 }
 
 .brand:hover {
@@ -176,6 +177,10 @@ body:has(.hero-masonry) footer {
 .card h2 {
   margin-top: 2rem;
   margin-bottom: 0.75rem;
+}
+
+.card > .basic-info-links li {
+  margin: 0.5rem 0;
 }
 
 .card > p {

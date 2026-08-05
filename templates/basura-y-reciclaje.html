@@ -4,16 +4,148 @@
 {% block title %}Recolección de basura y reciclaje{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/informacion.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/informacion.css' %}" />
 {% endblock %}
 
 {% block content %}
 <article class="info-page">
   <h1>Recolección de basura y reciclaje</h1>
 
-  <section class="info-section" aria-labelledby="basura-heading">
-    <h2 id="basura-heading">Recolección de basura y reciclaje</h2>
-    <p><em>Contenido en preparación.</em></p>
+  <section class="waste-section" aria-labelledby="basura-heading">
+    <h2 id="basura-heading">🗑️&nbsp;&nbsp;Recolección de Basura</h2>
+    <p class="waste-when">
+      <strong>Cuándo: &nbsp;MARTES</strong> &mdash;usualmente antes de las 8:00 a.m.
+    </p>
+    <p class="waste-note">
+      Se solicita a los vecinos sacar la basura el mismo martes por la mañana para evitar que las bolsas sean rotas durante la noche por perros o mapaches. Para apoyar con el orden y mantener la buena apariencia de nuestro residencial, se ruega a los vecinos sacar la basura sólo el lunes por la noche o el martes por la mañana.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-col compare-col--yes">
+        <h3>Sí va</h3>
+        <ul>
+          <li class="waste-item-success">Zacate y otros residuos de jardín (en bolsas livianas y bien cerradas)</li>
+          <li class="waste-item-success">Restos de comida y residuos orgánicos</li>
+          <li class="waste-item-success">Pañales y toallas sanitarias</li>
+          <li class="waste-item-success">Papel higiénico usado, servilletas sucias</li>
+          <li class="waste-item-success">Empaques sucios o contaminados con comida</li>
+          <li class="waste-item-success">Barreduras y polvo</li>
+        </ul>
+      </div>
+      <div class="compare-col compare-col--no">
+        <h3>No va</h3>
+        <ul>
+          <li class="waste-item-fail">Botellas, latas, vidrio, cartón y revistas
+            &rarr; <a href="#reciclaje-ordinario-heading">reciclaje ordinario</a></li>
+          <li class="waste-item-fail">Pilas, baterías y bombillos
+            &rarr; <a href="#reciclaje-especial-heading">campaña mensual</a></li>
+          <li class="waste-item-fail">Aceite de cocina usado
+            &rarr; <a href="#reciclaje-especial-heading">campaña mensual</a></li>
+          <li class="waste-item-fail">Aparatos eléctricos y electrónicos
+            &rarr; <a href="#reciclaje-especial-heading">campaña mensual</a></li>
+          <li class="waste-item-fail">Escombros, muebles y colchones
+            &rarr; <a href="/informacion/desechos-no-tradicionales/">desechos no tradicionales</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="waste-section" aria-labelledby="reciclaje-ordinario-heading">
+    <h2 id="reciclaje-ordinario-heading">♻️&nbsp;&nbsp;Recolección de Reciclaje Ordinario</h2>
+    <p class="waste-when">
+      <strong>Cuándo: &nbsp;VIERNES</strong> &mdash;usualmente antes de las 8:00 a.m.
+    </p>
+    <div class="compare-grid">
+      <div class="compare-col compare-col--yes">
+        <h3>Sí va</h3>
+        <ul>
+          <li class="waste-item-success">Botellas de vidrio enteras (no quebradas)</li>
+          <li class="waste-item-success">Bolsas plásticas y plástico #4 al #7</li>
+          <li class="waste-item-success">Botellas plásticas #1 y #2, tetrapak, metal</li>
+          <li class="waste-item-success">Cartón corrugado, cartoncillos, cartones de huevo</li>
+          <li class="waste-item-success">Empaques metalizados, estereofón</li>
+          <li class="waste-item-success">Libros y revistas viejas (en bolsas livianas)</li>
+        </ul>
+      </div>
+      <div class="compare-col compare-col--no">
+        <h3>No va</h3>
+        <ul>
+          <li class="waste-item-fail">Vidrio quebrado &rarr; <a href="#basura-heading">basura</a></li>
+          <li class="waste-item-fail">Zacate y residuos de jardín &rarr; <a href="#basura-heading">basura</a></li>
+          <li class="waste-item-fail">Empaques con residuos de comida sin enjuagar &rarr; <a href="#basura-heading">basura</a></li>
+          <li class="waste-item-fail">Bombillos y medicamentos vencidos
+            &rarr; <a href="#reciclaje-especial-heading">campaña mensual</a></li>
+          <li class="waste-item-fail">Aceite de cocina usado
+            &rarr; <a href="#reciclaje-especial-heading">campaña mensual</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="sorting-info">
+      <h3>¿Cómo debería clasificar el material de reciclaje?</h3>
+      <p>
+        Los materiales reciclables deberían separarse en dos bolsas, según si tienen mercado de reciclaje tradicional en el país o se aprovechan de otra forma:
+      </p>
+
+      <div class="card-grid card-grid--wide">
+        <div class="info-card info-card--wide">
+          <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">🔵</span>Bolsa de Reciclaje</h3>
+          <p class="info-card__meta">Materiales que se reprocesan en el mismo tipo de material.</p>
+          <ul class="info-card__list">
+            <li><strong>Plástico #1 y #2 (PET/HDPE)</strong>: botellas de agua, envases de champú, envases de detergente, etc.</li>
+            <li><strong>Tetrapak</strong>: envases de leche, jugos, etc.</li>
+            <li><strong>Metal</strong></li>
+            <li><strong>Latas de aluminio</strong></li>
+            <li><strong>Botellas de vidrio</strong></li>
+            <li><strong>Cartón</strong></li>
+            <li><strong>Papel</strong></li>
+          </ul>
+        </div>
+
+        <div class="info-card info-card--wide">
+          <h3 class="info-card__title"><span class="card-icon" aria-hidden="true">🟡</span> Bolsa de Coprocesamiento</h3>
+          <p class="info-card__meta">Materiales sin mercado de reciclaje tradicional, que se aprovechan como combustible alterno</p>
+          <ul class="info-card__list">
+            <li><strong>Plástico #4 al #7</strong>: bolsas, empaques flexibles, vajilla desechable, etc.</li>
+            <li><strong>Cartoncillos</strong>: rollos de papel higiénico, cajas de cereal, cajas de zapatos, etc.</li>
+            <li><strong>Cartones de huevo</strong></li>
+            <li><strong>Empaques metalizados</strong></li>
+            <li><strong>Estereofón</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="waste-section" aria-labelledby="reciclaje-especial-heading">
+    <h2 id="reciclaje-especial-heading">⚠️&nbsp;&nbsp;Reciclaje de Residuos Especiales (Campaña Mensual)</h2>
+    <p class="waste-when">
+      <strong>Cuándo: &nbsp;PRIMER SÁBADO DE CADA MES</strong> &mdash;de 8:00 a.m. a 12:00 md,
+      en la Municipalidad de La Unión (Tres Ríos).
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-col compare-col--yes">
+        <h3>Sí va</h3>
+        <ul>
+          <li class="waste-item-success">Medicamentos vencidos</li>
+          <li class="waste-item-success">Bombillos y fluorescentes</li>
+          <li class="waste-item-success">Baterías y pilas</li>
+          <li class="waste-item-success">Aceite usado de cocina</li>
+          <li class="waste-item-success">Aparatos eléctricos y electrónicos</li>
+          <li class="waste-item-success">Ecobotellas / empaques polilaminados</li>
+          <li class="waste-item-success">Residuos de PVC</li>
+        </ul>
+      </div>
+      <div class="compare-col compare-col--no">
+        <h3>No va</h3>
+        <ul>
+          <li class="waste-item-fail">Metal y vidrio
+            &rarr; <a href="#reciclaje-ordinario-heading">reciclaje ordinario</a></li>
+          <li class="waste-item-fail">Láminas de zinc
+            &rarr; <a href="/informacion/desechos-no-tradicionales/">desechos no tradicionales</a></li>
+        </ul>
+      </div>
+    </div>
   </section>
 </article>
 {% endblock %}

@@ -183,3 +183,114 @@
   color: #111;
   text-decoration: underline;
 }
+
+/* Recolección de basura y reciclaje */
+
+.waste-section {
+  margin-bottom: 2.5rem;
+}
+
+.waste-section h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.waste-when {
+  font-size: 0.95rem;
+  color: #333;
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+
+.waste-note {
+  font-size: 0.8rem;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.compare-col {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.compare-col h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.6rem;
+}
+
+.compare-col ul {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.compare-col--yes {
+  background: #eaf6ec;
+}
+
+.compare-col--yes h3 {
+  color: #276b38;
+}
+
+.compare-col--no {
+  background: #fbeaea;
+}
+
+.compare-col--no h3 {
+  color: #8a2c2c;
+}
+
+.compare-col a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.waste-item-success {
+  display: inline-block;
+  padding-left: 22px;
+  background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2720%27%20height%3D%2720%27%20viewBox%3D%270%200%2020%2020%27%3E%3Ctext%20x%3D%270%27%20y%3D%2716%27%20font-size%3D%2716%27%3E%E2%9C%85%3C/text%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-position: left 3px;
+  background-size: 16px 16px;
+  margin-bottom: 0.4rem;
+}
+
+.waste-item-fail {
+  display: inline-block;
+  padding-left: 22px;
+  background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2720%27%20height%3D%2720%27%20viewBox%3D%270%200%2020%2020%27%3E%3Ctext%20x%3D%270%27%20y%3D%2716%27%20font-size%3D%2716%27%3E%F0%9F%9A%AB%3C/text%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-position: left 3px;
+  background-size: 16px 16px;
+  margin-bottom: 0.4rem;
+}
+
+.compare-col a:hover,
+.compare-col a:focus {
+  text-decoration: underline;
+}
+
+.sorting-info {
+  margin-top: 1.5rem;
+}
+
+.sorting-info h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.sorting-info > p {
+  margin-bottom: 1.5rem;
+}
