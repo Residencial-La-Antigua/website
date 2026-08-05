@@ -7,4 +7,5 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=False
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DATABASE_URL=${DATABASE_URL}
     command: sh -c "uv run manage.py migrate && uv run gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
