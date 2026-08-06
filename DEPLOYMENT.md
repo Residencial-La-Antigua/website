@@ -35,3 +35,15 @@ ALLOWED_HOSTS="ejemplo.com,www.ejemplo.com" \
 DATABASE_URL="postgres://usuario:contraseña@host:5432/nombre_db" \
 docker compose -f docker-compose.prod.yml up --build
 ```
+
+El arranque real para producción (`collectstatic` → `migrate` → Gunicorn) se encuentra especificado en [scripts/start-prod.sh](scripts/start-prod.sh), y es el `CMD` por defecto del [Dockerfile](Dockerfile). Así, `docker-compose.prod.yml` no lo especifica por aparte.
+
+La app escucha en el puerto definido por la variable de entorno `PORT` (por defecto `8000`). Esto es para compatibilidad con plataformas como Render que asignan su propio puerto dinámicamente.
+
+## Desplegar en Render
+
+Render construye la imagen directamente desde el [Dockerfile](Dockerfile) i.e. no lee `docker-compose.prod.yml`. Al crear el Web Service:
+
+- **Language**: Docker
+- **Docker Command** (en Advanced): `sh scripts/start-prod.sh`
+- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, y `ALLOWED_HOSTS` (este último hay que agregarlo _después_ de crear el servicio, una vez que Render asigna el dominio `*.onrender.com` — de lo contrario todas las peticiones se rechazan con `DisallowedHost`).

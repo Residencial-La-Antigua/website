@@ -11,4 +11,4 @@ RUN uv sync --frozen
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "uv run manage.py migrate && uv run manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "scripts/start-prod.sh"]
