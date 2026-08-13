@@ -1,0 +1,65 @@
+.calendar-card {
+  max-width: 960px;
+  padding: 1.5rem;
+}
+
+.calendar-card h1 {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+#calendar {
+  font-family: inherit;
+}
+
+#calendar .fc-daygrid-day:hover {
+  background-color: var(--color-success-bg);
+  cursor: pointer;
+}
+
+#calendar .fc-event {
+  cursor: pointer;
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+#calendar .fc-button-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+#calendar .fc-button-primary:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.event-modal {
+  max-width: 420px;
+  width: 90vw;
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--color-text);
+}
+
+.event-modal::backdrop {
+  background-color: rgba(42, 42, 37, 0.5);
+}
+
+.event-modal-form h2 {
+  margin-top: 0;
+}
+
+.event-modal-schedule {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.event-modal-location {
+  color: var(--color-text-muted);
+}
+
+.event-modal-description {
+  white-space: pre-line;
+}
