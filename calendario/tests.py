@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Evento
+from .models import Event
 
 User = get_user_model()
 
@@ -72,15 +72,15 @@ class EventListViewTests(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_returns_events_within_requested_range(self):
-        Evento.objects.create(
-            titulo="Dentro del rango",
-            descripcion="desc",
-            ubicacion="cancha",
-            fecha_inicio=datetime(2026, 3, 15, 18, 0, tzinfo=UTC),
+        Event.objects.create(
+            title="Dentro del rango",
+            description="desc",
+            location="cancha",
+            start_at=datetime(2026, 3, 15, 18, 0, tzinfo=UTC),
         )
-        Evento.objects.create(
-            titulo="Fuera del rango",
-            fecha_inicio=datetime(2026, 4, 15, 18, 0, tzinfo=UTC),
+        Event.objects.create(
+            title="Fuera del rango",
+            start_at=datetime(2026, 4, 15, 18, 0, tzinfo=UTC),
         )
 
         response = self.client.get(
@@ -99,12 +99,12 @@ class EventListViewTests(TestCase):
 
     def test_no_params_uses_current_month(self):
         now = timezone.now()
-        Evento.objects.create(titulo="Este mes", fecha_inicio=now)
+        Event.objects.create(title="Este mes", start_at=now)
         if now.month == 12:
             other_month = now.replace(year=now.year + 1, month=1, day=1)
         else:
             other_month = now.replace(month=now.month + 1, day=1)
-        Evento.objects.create(titulo="Otro mes", fecha_inicio=other_month)
+        Event.objects.create(title="Otro mes", start_at=other_month)
 
         response = self.client.get(reverse("calendario-eventos"))
 

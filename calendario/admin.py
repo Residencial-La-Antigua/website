@@ -1,23 +1,23 @@
 from django.contrib import admin
 
-from .models import Confirmacion, Evento
+from .models import Confirmation, Event
 
 
-@admin.register(Evento)
-class EventoAdmin(admin.ModelAdmin):
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
     list_display = (
-        "titulo",
-        "fecha_inicio",
-        "fecha_fin",
-        "ubicacion",
-        "creado_por",
+        "title",
+        "start_at",
+        "end_at",
+        "location",
+        "created_by",
     )
-    list_filter = ("fecha_inicio",)
-    search_fields = ("titulo", "descripcion", "ubicacion")
+    list_filter = ("start_at",)
+    search_fields = ("title", "description", "location")
 
 
-@admin.register(Confirmacion)
-class ConfirmacionAdmin(admin.ModelAdmin):
-    list_display = ("usuario", "evento", "confirmado_en")
-    list_filter = ("evento",)
-    search_fields = ("usuario__username", "evento__titulo")
+@admin.register(Confirmation)
+class ConfirmationAdmin(admin.ModelAdmin):
+    list_display = ("user", "event", "confirmed_at")
+    list_filter = ("event",)
+    search_fields = ("user__username", "event__title")

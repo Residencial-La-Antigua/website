@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from .mixins import LoginRequiredJSONMixin
-from .models import Evento
+from .models import Event
 
 
 class CalendarView(LoginRequiredMixin, TemplateView):
@@ -27,9 +27,8 @@ class EventListView(LoginRequiredJSONMixin, View):
         if start is None or end is None:
             start, end = self._current_month_range()
 
-        events = Evento.objects.filter(fecha_inicio__lt=end).filter(
-            Q(fecha_fin__gt=start)
-            | Q(fecha_fin__isnull=True, fecha_inicio__gte=start)
+        events = Event.objects.filter(start_at__lt=end).filter(
+            Q(end_at__gt=start) | Q(end_at__isnull=True, start_at__gte=start)
         )
 
         return JsonResponse(
@@ -70,11 +69,11 @@ class EventListView(LoginRequiredJSONMixin, View):
     def _serialize(event):
         return {
             "id": event.id,
-            "title": event.titulo,
-            "start": event.fecha_inicio.isoformat(),
-            "end": event.fecha_fin.isoformat() if event.fecha_fin else None,
+            "title": event.title,
+            "start": event.start_at.isoformat(),
+            "end": event.end_at.isoformat() if event.end_at else None,
             "extendedProps": {
-                "description": event.descripcion,
-                "location": event.ubicacion,
+                "description": event.description,
+                "location": event.location,
             },
         }
