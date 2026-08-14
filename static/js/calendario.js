@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var eventsUrl = calendarEl.dataset.eventsUrl;
   var modal = document.getElementById("event-modal");
+  var yearSelect = document.getElementById("year-select");
+
+  populateYearOptions(yearSelect);
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
@@ -11,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     timeZone: "UTC",
     height: "auto",
     headerToolbar: {
-      left: "",
+      left: "prev,next today",
       center: "title",
       right: "",
     },
@@ -32,9 +35,32 @@ document.addEventListener("DOMContentLoaded", function () {
     eventClick: function (info) {
       showEventDetail(info.event);
     },
+    datesSet: function (info) {
+      yearSelect.value = String(info.view.currentStart.getUTCFullYear());
+    },
   });
 
   calendar.render();
+
+  yearSelect.addEventListener("change", function () {
+    var currentDate = calendar.getDate();
+    calendar.gotoDate(
+      new Date(
+        Date.UTC(Number(yearSelect.value), currentDate.getUTCMonth(), 1)
+      )
+    );
+  });
+
+  function populateYearOptions(select) {
+    var currentYear = new Date().getUTCFullYear();
+    for (var year = currentYear - 5; year <= currentYear + 5; year++) {
+      var option = document.createElement("option");
+      option.value = String(year);
+      option.textContent = String(year);
+      if (year === currentYear) option.selected = true;
+      select.appendChild(option);
+    }
+  }
 
   function showEventDetail(event) {
     document.getElementById("event-modal-title").textContent = event.title;

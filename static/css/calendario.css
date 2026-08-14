@@ -3,13 +3,55 @@
   padding: 1.5rem;
 }
 
+.calendar-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
 .calendar-card h1 {
-  margin-top: 0;
-  margin-bottom: 1.25rem;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25em;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+.calendar-controls label {
+  margin-bottom: 0;
+}
+
+.calendar-controls select {
+  width: auto;
 }
 
 #calendar {
   font-family: inherit;
+}
+
+#calendar .fc-toolbar {
+  flex-direction: row-reverse;
+}
+
+#calendar .fc-toolbar-title {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+#calendar .fc-toolbar-title::first-letter {
+  text-transform: uppercase;
+}
+
+#calendar .fc-toolbar-chunk:last-child {
+  display: none;
 }
 
 #calendar .fc-daygrid-day:hover {

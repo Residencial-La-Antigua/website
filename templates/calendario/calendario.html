@@ -9,7 +9,13 @@
 
 {% block content %}
   <div class="card calendar-card">
-    <h1>Calendario de eventos</h1>
+    <header>
+      <h1>Calendario de Eventos</h1>
+      <div class="calendar-controls">
+        <label for="year-select">Año</label>
+        <select id="year-select"></select>
+      </div>
+    </header>
     <div
       id="calendar"
       data-events-url="{% url 'calendario-eventos' %}"
@@ -29,6 +35,6 @@
 
 {% block extra_js %}
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/es.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/es.global.min.js"></script>
   <script src="{% static 'js/calendario.js' %}"></script>
 {% endblock %}
