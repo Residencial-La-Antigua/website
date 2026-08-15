@@ -3,7 +3,7 @@ services:
     image: website:latest
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "127.0.0.1:${HOST_PORT:-8000}:${PORT:-8000}"
     environment:
       - SECRET_KEY=${SECRET_KEY:?SECRET_KEY debe estar definida}
       - DEBUG=False
