@@ -49,15 +49,15 @@ La app escucha en el puerto definido por la variable de entorno `PORT` (por defe
 1. Crear un usuario dedicado para este runner, solo en el grupo `docker`:
 
    ```bash
-   sudo adduser --disabled-password --gecos "" gha-website
-   sudo passwd -l gha-website
-   sudo usermod -aG docker gha-website
+   sudo adduser --disabled-password --gecos "" gha-deploy
+   sudo passwd -l gha-deploy
+   sudo usermod -aG docker gha-deploy
    ```
 
-2. Registrar el runner para este repositorio: en GitHub, ir a Settings → Actions → Runners → New self-hosted runner → Linux, X64. Copiar los comandos que GitHub genera ahí (incluyen un token de registro temporal) y correrlos en la VM como `gha-website`:
+2. Registrar el runner para este repositorio: en GitHub, ir a Settings → Actions → Runners → New self-hosted runner → Linux, X64. Copiar los comandos que GitHub genera ahí (incluyen un token de registro temporal) y correrlos en la VM como `gha-deploy`:
 
    ```bash
-   sudo -iu gha-website
+   sudo -iu gha-deploy
    mkdir -p ~/actions-runner && cd ~/actions-runner
 
    # Correr los comandos que la página de GitHub muestra para Linux x64
@@ -66,7 +66,7 @@ La app escucha en el puerto definido por la variable de entorno `PORT` (por defe
 3. Instalar el runner como servicio, para que sobreviva reinicios de la VM:
 
    ```bash
-   sudo ./svc.sh install gha-website
+   sudo ./svc.sh install gha-deploy
    sudo ./svc.sh start
    ```
 
