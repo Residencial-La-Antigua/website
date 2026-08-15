@@ -16,74 +16,34 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run manage.py test
 
+  # Runs on a self-hosted runner installed directly on the target VM (see
+  # DEPLOYMENT.md), not a GitHub-hosted runner. The VM's NSG only allows SSH
+  # from a single whitelisted admin IP, which GitHub-hosted runners can't
+  # satisfy since their IPs are large, rotating ranges.
   deploy:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     env:
       IMAGE_TAG: website:latest
-      DEPLOY_DIR: website-deploy
     steps:
       - uses: actions/checkout@v7
 
-      - name: Build image
-        run: docker build -t "$IMAGE_TAG" .
-
-      # No container registry involved: the image built above is saved to a
-      # tarball and copied straight to the VM with scp, then `docker load`
-      # restores it there. See "Deploy mechanism" in the PR/commit that
-      # introduced this workflow for why (no GHCR/ACR in this setup).
-      - name: Save image to a tarball
-        run: docker save "$IMAGE_TAG" | gzip > image.tar.gz
-
-      - name: Configure SSH
-        env:
-          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
-          VM_HOST: ${{ secrets.VM_HOST }}
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "$VM_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$VM_HOST" >> ~/.ssh/known_hosts
-
-      # Written to a local file first (not interpolated directly into a
-      # remote ssh command string) so secret values can't break shell
-      # quoting on either end.
       - name: Write env file for the container
         env:
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           {
-            echo "SECRET_KEY=$DJANGO_SECRET_KEY"
+            echo "SECRET_KEY=$SECRET_KEY"
             echo "ALLOWED_HOSTS=$ALLOWED_HOSTS"
             echo "DATABASE_URL=$DATABASE_URL"
-          } > .env.deploy
+          } > .env
 
-      - name: Copy image, compose file, and env to the VM
-        env:
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_HOST: ${{ secrets.VM_HOST }}
+      - name: Build image
+        run: docker build -t "$IMAGE_TAG" .
+
+      - name: Restart the app
         run: |
-          ssh -i ~/.ssh/deploy_key "$VM_USER@$VM_HOST" "mkdir -p ~/$DEPLOY_DIR"
-          scp -i ~/.ssh/deploy_key image.tar.gz docker-compose.prod.yml .env.deploy \
-            "$VM_USER@$VM_HOST:~/$DEPLOY_DIR/"
-          ssh -i ~/.ssh/deploy_key "$VM_USER@$VM_HOST" \
-            "mv ~/$DEPLOY_DIR/.env.deploy ~/$DEPLOY_DIR/.env"
-
-      - name: Load image and restart the app
-        env:
-          VM_USER: ${{ secrets.VM_USER }}
-          VM_HOST: ${{ secrets.VM_HOST }}
-        run: |
-          ssh -i ~/.ssh/deploy_key "$VM_USER@$VM_HOST" "
-            set -e
-            cd ~/$DEPLOY_DIR
-            docker load < image.tar.gz
-            docker compose -f docker-compose.prod.yml up -d
-            docker image prune -f
-          "
-
-      - name: Clean up local secrets
-        if: always()
-        run: rm -f ~/.ssh/deploy_key .env.deploy image.tar.gz
+          docker compose -f docker-compose.prod.yml --env-file .env up -d
+          docker image prune -f

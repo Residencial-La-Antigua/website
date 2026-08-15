@@ -40,6 +40,42 @@ El arranque real para producción (`collectstatic` → `migrate` → Gunicorn) s
 
 La app escucha en el puerto definido por la variable de entorno `PORT` (por defecto `8000`). Esto es para compatibilidad con plataformas como Render que asignan su propio puerto dinámicamente.
 
+## Despliegue automático (GitHub Actions + VM de Azure)
+
+[.github/workflows/deploy.yml](.github/workflows/deploy.yml) despliega automáticamente a una VM de Azure en cada push a `main`. El job `deploy` corre en un **runner autohospedado (self-hosted) instalado directamente en la VM**, no en un runner de GitHub. Con un runner autohospedado, el job corre localmente en la VM: no hace falta abrir el puerto 22 a GitHub ni manejar llaves SSH en absoluto.
+
+### Configuración única en la VM
+
+1. Crear un usuario dedicado para este runner, solo en el grupo `docker`:
+
+   ```bash
+   sudo adduser --disabled-password --gecos "" gha-website
+   sudo passwd -l gha-website
+   sudo usermod -aG docker gha-website
+   ```
+
+2. Registrar el runner para este repositorio: en GitHub, ir a Settings → Actions → Runners → New self-hosted runner → Linux, X64. Copiar los comandos que GitHub genera ahí (incluyen un token de registro temporal) y correrlos en la VM como `gha-website`:
+
+   ```bash
+   sudo -iu gha-website
+   mkdir -p ~/actions-runner && cd ~/actions-runner
+
+   # Correr los comandos que la página de GitHub muestra para Linux x64
+   ```
+
+3. Instalar el runner como servicio, para que sobreviva reinicios de la VM:
+
+   ```bash
+   sudo ./svc.sh install gha-website
+   sudo ./svc.sh start
+   ```
+
+4. Confirmar en GitHub (Settings → Actions → Runners) que el runner aparece en línea antes de disparar un deploy.
+
+### Cómo funciona el deploy
+
+El job `deploy` hace checkout del código directamente en la VM, escribe un `.env` a partir de los secretos requeridos, construye la imagen con `docker build`, y reinicia el contenedor con `docker compose -f docker-compose.prod.yml up -d`. `docker image prune -f` al final evita que las imágenes viejas se acumulen en disco.
+
 ## Desplegar en Render
 
 Render construye la imagen directamente desde el [Dockerfile](Dockerfile) i.e. no lee `docker-compose.prod.yml`. Al crear el Web Service:
