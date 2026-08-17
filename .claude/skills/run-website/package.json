@@ -1,0 +1,9 @@
+{
+  "name": "run-website-driver",
+  "private": true,
+  "type": "module",
+  "description": "Playwright driver for the run-website Claude Code skill. Not part of the Django app's own dependency tree.",
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
