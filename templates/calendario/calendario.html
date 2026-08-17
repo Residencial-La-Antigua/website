@@ -19,8 +19,14 @@
     <div
       id="calendar"
       data-events-url="{% url 'calendario-eventos' %}"
+      data-create-url="{% url 'calendario-eventos-crear' %}"
+      data-is-staff="{{ user.is_staff|yesno:'true,false' }}"
     ></div>
   </div>
+
+  {% if user.is_staff %}
+    <form id="csrf-form" style="display: none">{% csrf_token %}</form>
+  {% endif %}
 
   <dialog id="event-modal" class="event-modal">
     <form method="dialog" class="event-modal-form">
@@ -31,6 +37,41 @@
       <button type="submit" class="btn">Cerrar</button>
     </form>
   </dialog>
+
+  {% if user.is_staff %}
+    <dialog id="event-form-modal" class="event-modal">
+      <form id="event-form" class="event-modal-form">
+        <h2>Nuevo evento</h2>
+        <p id="event-form-errors" class="event-form-errors"></p>
+        <label for="event-form-title">Título</label>
+        <input type="text" id="event-form-title" name="title" required />
+
+        <label for="event-form-start">Fecha y hora de inicio</label>
+        <input
+          type="datetime-local"
+          id="event-form-start"
+          name="start_at"
+          required
+        />
+
+        <label for="event-form-end">Fecha y hora de fin (opcional)</label>
+        <input type="datetime-local" id="event-form-end" name="end_at" />
+
+        <label for="event-form-location">Ubicación (opcional)</label>
+        <input type="text" id="event-form-location" name="location" />
+
+        <label for="event-form-description">Descripción (opcional)</label>
+        <textarea id="event-form-description" name="description"></textarea>
+
+        <div class="event-form-actions">
+          <button type="submit" class="btn">Guardar</button>
+          <button type="button" class="btn-link" data-close-event-form>
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </dialog>
+  {% endif %}
 {% endblock %}
 
 {% block extra_js %}

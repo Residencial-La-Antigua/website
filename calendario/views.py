@@ -8,8 +8,22 @@ from django.utils.dateparse import parse_datetime
 from django.views import View
 from django.views.generic import TemplateView
 
-from .mixins import LoginRequiredJSONMixin
+from .forms import EventForm
+from .mixins import LoginRequiredJSONMixin, StaffRequiredJSONMixin
 from .models import Event
+
+
+def serialize_event(event):
+    return {
+        "id": event.id,
+        "title": event.title,
+        "start": event.start_at.isoformat(),
+        "end": event.end_at.isoformat() if event.end_at else None,
+        "extendedProps": {
+            "description": event.description,
+            "location": event.location,
+        },
+    }
 
 
 class CalendarView(LoginRequiredMixin, TemplateView):
@@ -32,7 +46,7 @@ class EventListView(LoginRequiredJSONMixin, View):
         )
 
         return JsonResponse(
-            [self._serialize(event) for event in events], safe=False
+            [serialize_event(event) for event in events], safe=False
         )
 
     @staticmethod
@@ -65,15 +79,17 @@ class EventListView(LoginRequiredJSONMixin, View):
             ),
         )
 
-    @staticmethod
-    def _serialize(event):
-        return {
-            "id": event.id,
-            "title": event.title,
-            "start": event.start_at.isoformat(),
-            "end": event.end_at.isoformat() if event.end_at else None,
-            "extendedProps": {
-                "description": event.description,
-                "location": event.location,
-            },
-        }
+
+class EventCreateView(StaffRequiredJSONMixin, View):
+    def post(self, request):
+        form = EventForm(request.POST)
+        if not form.is_valid():
+            return JsonResponse(
+                {"errors": form.errors.get_json_data()}, status=400
+            )
+
+        event = form.save(commit=False)
+        event.created_by = request.user
+        event.save()
+
+        return JsonResponse(serialize_event(event), status=201)

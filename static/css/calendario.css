@@ -54,13 +54,14 @@
   display: none;
 }
 
-#calendar .fc-daygrid-day:hover {
+#calendar.is-staff .fc-daygrid-day:hover {
   background-color: var(--color-success-bg);
   cursor: pointer;
 }
 
 #calendar .fc-event {
   cursor: pointer;
+  color: var(--color-text-light);
   border-color: var(--color-primary);
   background-color: var(--color-primary);
 }
@@ -104,4 +105,20 @@
 
 .event-modal-description {
   white-space: pre-line;
+}
+
+.event-form-errors {
+  color: var(--color-error-text);
+  font-size: 0.875rem;
+}
+
+.event-form-errors:empty {
+  display: none;
+}
+
+.event-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }

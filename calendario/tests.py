@@ -112,3 +112,76 @@ class EventListViewTests(TestCase):
         titles = [event["title"] for event in response.json()]
         self.assertIn("Este mes", titles)
         self.assertNotIn("Otro mes", titles)
+
+
+class EventCreateViewTests(TestCase):
+    def test_requires_authentication(self):
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Jornada", "start_at": "2026-08-20T09:00"},
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(Event.objects.count(), 0)
+
+    def test_requires_staff(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Jornada", "start_at": "2026-08-20T09:00"},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Event.objects.count(), 0)
+
+    def test_staff_can_create_event_with_required_fields_only(self):
+        admin = create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Jornada de siembra", "start_at": "2026-08-20T09:00"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Event.objects.count(), 1)
+        event = Event.objects.get()
+        self.assertEqual(event.title, "Jornada de siembra")
+        self.assertEqual(event.created_by, admin)
+        self.assertEqual(response.json()["title"], "Jornada de siembra")
+
+    def test_staff_can_create_event_with_all_fields(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Jornada de siembra",
+                "description": "Traer guantes",
+                "location": "Calle Jade",
+                "start_at": "2026-08-20T09:00",
+                "end_at": "2026-08-20T11:00",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = Event.objects.get()
+        self.assertEqual(event.description, "Traer guantes")
+        self.assertEqual(event.location, "Calle Jade")
+        self.assertIsNotNone(event.end_at)
+
+    def test_missing_required_field_returns_errors_without_creating(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"), {"description": "Sin título"}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+        errors = response.json()["errors"]
+        self.assertIn("title", errors)
+        self.assertIn("start_at", errors)

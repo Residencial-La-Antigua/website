@@ -3,12 +3,16 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!calendarEl) return;
 
   var eventsUrl = calendarEl.dataset.eventsUrl;
+  var createUrl = calendarEl.dataset.createUrl;
+  var isStaff = calendarEl.dataset.isStaff === "true";
   var modal = document.getElementById("event-modal");
   var yearSelect = document.getElementById("year-select");
 
+  if (isStaff) calendarEl.classList.add("is-staff");
+
   populateYearOptions(yearSelect);
 
-  var calendar = new FullCalendar.Calendar(calendarEl, {
+  var calendarOptions = {
     initialView: "dayGridMonth",
     locale: "es",
     timeZone: "UTC",
@@ -38,9 +42,21 @@ document.addEventListener("DOMContentLoaded", function () {
     datesSet: function (info) {
       yearSelect.value = String(info.view.currentStart.getUTCFullYear());
     },
-  });
+  };
+
+  if (isStaff) {
+    calendarOptions.dateClick = function (info) {
+      showEventForm(info.dateStr);
+    };
+  }
+
+  var calendar = new FullCalendar.Calendar(calendarEl, calendarOptions);
 
   calendar.render();
+
+  if (isStaff) {
+    setUpEventForm(calendar, createUrl);
+  }
 
   yearSelect.addEventListener("change", function () {
     var currentDate = calendar.getDate();
@@ -88,5 +104,71 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!end) return formattedStart;
     var formattedEnd = new Intl.DateTimeFormat("es", options).format(end);
     return formattedStart + " — " + formattedEnd;
+  }
+
+  function getCsrfToken() {
+    var input = document.querySelector("#csrf-form [name=csrfmiddlewaretoken]");
+    return input ? input.value : "";
+  }
+
+  function showEventForm(dateStr) {
+    var formModal = document.getElementById("event-form-modal");
+    var form = document.getElementById("event-form");
+    form.reset();
+    document.getElementById("event-form-errors").textContent = "";
+    document.getElementById("event-form-start").value = dateStr + "T09:00";
+    formModal.showModal();
+  }
+
+  function setUpEventForm(calendar, createUrl) {
+    var formModal = document.getElementById("event-form-modal");
+    var form = document.getElementById("event-form");
+    var errorsEl = document.getElementById("event-form-errors");
+
+    formModal
+      .querySelector("[data-close-event-form]")
+      .addEventListener("click", function () {
+        formModal.close();
+      });
+
+    form.addEventListener("submit", function (submitEvent) {
+      submitEvent.preventDefault();
+      errorsEl.textContent = "";
+
+      fetch(createUrl, {
+        method: "POST",
+        headers: { "X-CSRFToken": getCsrfToken() },
+        body: new FormData(form),
+      })
+        .then(function (response) {
+          if (response.status === 201) {
+            formModal.close();
+            form.reset();
+            calendar.refetchEvents();
+            return;
+          }
+          return response.json().then(function (data) {
+            throw data;
+          });
+        })
+        .catch(function (data) {
+          errorsEl.textContent = formatFormErrors(data);
+        });
+    });
+  }
+
+  function formatFormErrors(data) {
+    if (!data || !data.errors) {
+      return "No se pudo guardar el evento.";
+    }
+    return Object.keys(data.errors)
+      .map(function (field) {
+        return data.errors[field]
+          .map(function (error) {
+            return error.message;
+          })
+          .join(" ");
+      })
+      .join(" ");
   }
 });
