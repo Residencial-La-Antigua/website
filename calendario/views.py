@@ -2,7 +2,8 @@ import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views import View
@@ -93,3 +94,10 @@ class EventCreateView(StaffRequiredJSONMixin, View):
         event.save()
 
         return JsonResponse(serialize_event(event), status=201)
+
+
+class EventDeleteView(StaffRequiredJSONMixin, View):
+    def delete(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        event.delete()
+        return HttpResponse(status=204)

@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Event
+from .models import Confirmation, Event
 
 User = get_user_model()
 
@@ -185,3 +185,58 @@ class EventCreateViewTests(TestCase):
         errors = response.json()["errors"]
         self.assertIn("title", errors)
         self.assertIn("start_at", errors)
+
+
+class EventDeleteViewTests(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Jornada de siembra",
+            start_at=datetime(2026, 8, 20, 9, 0, tzinfo=UTC),
+        )
+
+    def delete_url(self):
+        return reverse("calendario-eventos-eliminar", args=[self.event.pk])
+
+    def test_requires_authentication(self):
+        response = self.client.delete(self.delete_url())
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue(Event.objects.filter(pk=self.event.pk).exists())
+
+    def test_requires_staff(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.delete(self.delete_url())
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Event.objects.filter(pk=self.event.pk).exists())
+
+    def test_staff_can_delete_event(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.delete(self.delete_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Event.objects.filter(pk=self.event.pk).exists())
+
+    def test_deleting_event_cascades_confirmations(self):
+        resident = create_user("residente")
+        Confirmation.objects.create(user=resident, event=self.event)
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.delete(self.delete_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Confirmation.objects.count(), 0)
+
+    def test_deleting_nonexistent_event_returns_404(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.delete(
+            reverse("calendario-eventos-eliminar", args=[self.event.pk + 999])
+        )
+
+        self.assertEqual(response.status_code, 404)

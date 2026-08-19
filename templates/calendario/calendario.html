@@ -34,7 +34,14 @@
       <p id="event-modal-schedule" class="event-modal-schedule"></p>
       <p id="event-modal-location" class="event-modal-location"></p>
       <p id="event-modal-description" class="event-modal-description"></p>
-      <button type="submit" class="btn">Cerrar</button>
+      <div class="event-form-actions">
+        <button type="submit" class="btn">Cerrar</button>
+        {% if user.is_staff %}
+          <button type="button" id="event-delete-button" class="btn-danger">
+            Eliminar
+          </button>
+        {% endif %}
+      </div>
     </form>
   </dialog>
 
