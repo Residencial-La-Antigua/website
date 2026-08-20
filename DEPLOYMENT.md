@@ -17,7 +17,7 @@ DATABASE_URL="postgres://usuario:contraseña@host:5432/nombre_db"
 
 El ambiente de desarrollo (`dev`) usa SQLite por defecto, sin servicios adicionales, sin configuración. El ambiente de producción usa Postgres, configurado vía `DATABASE_URL` (parseado con [dj-database-url](https://pypi.org/project/dj-database-url/); el driver es [psycopg](https://www.psycopg.org/psycopg3/)). Esta decisión es intencional: dado el tamaño actual del proyecto (CRUD simple sobre el ORM de Django, sin funcionalidades específicas de Postgres), el riesgo de divergencia entre dev y producción es bajo, así que mantener SQLite en `dev` evita añadir un servicio extra al flujo de desarrollo local. Si el proyecto crece en complejidad, vale la pena revisar esta decisión.
 
-`docker-compose.prod.yml` no incluye un contenedor de Postgres — se espera una base de datos administrada externa (RDS, Render, Railway, Supabase, etc.), apuntada vía `DATABASE_URL`.
+`docker-compose.prod.yml` no incluye un contenedor de Postgres. Se espera una base de datos administrada externa (RDS, Render, Railway, Supabase, etc.), apuntada vía `DATABASE_URL`.
 
 ## Archivos estáticos
 
@@ -44,37 +44,13 @@ La app escucha en el puerto definido por la variable de entorno `PORT` (por defe
 
 [.github/workflows/deploy.yml](.github/workflows/deploy.yml) despliega automáticamente a una VM de Azure en cada push a `main`. El job `deploy` corre en un **runner autohospedado (self-hosted) instalado directamente en la VM**, no en un runner de GitHub. Con un runner autohospedado, el job corre localmente en la VM: no hace falta abrir el puerto 22 a GitHub ni manejar llaves SSH en absoluto.
 
-### Configuración única en la VM
-
-1. Crear un usuario dedicado para este runner, solo en el grupo `docker`:
-
-   ```bash
-   sudo adduser --disabled-password --gecos "" gha-deploy
-   sudo passwd -l gha-deploy
-   sudo usermod -aG docker gha-deploy
-   ```
-
-2. Registrar el runner para este repositorio: en GitHub, ir a Settings → Actions → Runners → New self-hosted runner → Linux, X64. Copiar los comandos que GitHub genera ahí (incluyen un token de registro temporal) y correrlos en la VM como `gha-deploy`:
-
-   ```bash
-   sudo -iu gha-deploy
-   mkdir -p ~/actions-runner && cd ~/actions-runner
-
-   # Correr los comandos que la página de GitHub muestra para Linux x64
-   ```
-
-3. Instalar el runner como servicio, para que sobreviva reinicios de la VM:
-
-   ```bash
-   sudo ./svc.sh install gha-deploy
-   sudo ./svc.sh start
-   ```
-
-4. Confirmar en GitHub (Settings → Actions → Runners) que el runner aparece en línea antes de disparar un deploy.
+La configuración vigente de Azure, nginx, TLS, Docker sin privilegios y el runner se encuentra en [Infra-doc.md](Infra-doc.md). No agregar `gha-deploy` al grupo `docker` del sistema: el runner usa su propio daemon sin privilegios.
 
 ### Cómo funciona el deploy
 
 El job `deploy` hace checkout del código directamente en la VM, escribe un `.env` a partir de los secretos requeridos, construye la imagen con `docker build`, y reinicia el contenedor con `docker compose -f docker-compose.prod.yml up -d`. `docker image prune -f` al final evita que las imágenes viejas se acumulen en disco.
+
+nginx termina HTTPS y reenvía `X-Forwarded-Proto` a Django. La aplicación debe configurar `SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")` para reconocer el esquema público. Este encabezado solo es confiable mientras nginx lo sobrescriba y Gunicorn permanezca publicado exclusivamente en `127.0.0.1`.
 
 ## Desplegar en Render
 
@@ -82,4 +58,4 @@ Render construye la imagen directamente desde el [Dockerfile](Dockerfile) i.e. n
 
 - **Language**: Docker
 - **Docker Command** (en Advanced): `sh scripts/start-prod.sh`
-- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, y `ALLOWED_HOSTS` (este último hay que agregarlo _después_ de crear el servicio, una vez que Render asigna el dominio `*.onrender.com` — de lo contrario todas las peticiones se rechazan con `DisallowedHost`).
+- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, y `ALLOWED_HOSTS` (este último hay que agregarlo _después_ de crear el servicio, una vez que Render asigna el dominio `*.onrender.com`; de lo contrario todas las peticiones se rechazan con `DisallowedHost`).

@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# Local editor settings
+/.vscode/settings.json
+
 # Local database
 db.sqlite3
 
