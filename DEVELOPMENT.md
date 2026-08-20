@@ -55,7 +55,6 @@ docker compose exec web uv run manage.py createsuperuser
 
 ### Para ambiente de producción
 
-- [ ] `SECURE_HSTS_SECONDS` — empezar con un valor corto para probar antes de subir a un año. Sigue pendiente porque un HSTS mal puesto (o revertido tarde) deja el dominio inaccesible por HTTPS hasta que expire el valor cacheado en el navegador, así que amerita su propio rollout con cuidado, aparte de lo de abajo.
 - [ ] Configurar `LOGGING` para producción — hoy no hay nada configurado más allá del comportamiento por defecto de Django (stdout/stderr, capturado por `docker compose logs`, sin niveles ni estructura).
 - [ ] Configurar `ADMINS`, `MANAGERS` y `EMAIL_BACKEND` — sin esto nadie recibe aviso por correo ante un error 500, y no hay de dónde enviar correos si en el futuro se agrega algo como recuperación de contraseña.
 - [ ] Agregar plantillas de error personalizadas (`404.html`, `500.html`, `403.html`, `400.html` en la raíz de `templates/`) — hoy Django sirve sus páginas de error genéricas, sin el diseño del sitio.
