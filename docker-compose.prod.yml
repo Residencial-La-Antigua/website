@@ -8,6 +8,5 @@ services:
       - SECRET_KEY=${SECRET_KEY:?SECRET_KEY debe estar definida}
       - DEBUG=False
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:?ALLOWED_HOSTS debe estar definida}
-      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:?CSRF_TRUSTED_ORIGINS debe estar definida (ej. https://tudominio.com)}
       - DATABASE_URL=${DATABASE_URL:?DATABASE_URL debe estar definida}
       - PORT=${PORT:-8000}

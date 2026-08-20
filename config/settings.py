@@ -42,30 +42,15 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-# Comma-separated list of trusted origins each including scheme, 
-# e.g. "https://example.com,https://www.example.com".
-# Required in production: without it, Django rejects same-site POSTs whenever
-# it can't otherwise prove the request's Origin matches its own host (e.g.
-# when running behind a reverse proxy that terminates HTTPS).
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
-]
-
-# Production runs behind an nginx reverse proxy that terminates HTTPS and
-# forwards plain HTTP to this app, so Django can't tell a request was secure
-# from the connection alone. This trusts nginx's X-Forwarded-Proto header
-# instead. This is safe only because the app's port isn't reachable except through
-# nginx, which overwrites (rather than passes through) that header. Harmless
-# locally: `manage.py runserver` never receives this header.
+# With this set, Django's own-host CSRF Origin check (Origin must match
+# this request's scheme + host) works correctly behind the proxy.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Off in local dev (DEBUG=True, plain http://localhost) where they'd break
-# things. SECURE_SSL_REDIRECT would redirect to a nonexistent local HTTPS
-# port, and *_COOKIE_SECURE would make the browser refuse to store the
-# session/CSRF cookies over http, breaking login.
-SECURE_SSL_REDIRECT = not DEBUG
+# login: the browser refuses to store a Secure-flagged cookie over http.
+# On in production (DEBUG=False). SECURE_SSL_REDIRECT is deliberately not
+# set here: nginx already redirects HTTP to HTTPS before Django ever sees
+# the request (see DEPLOYMENT.md).
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 
