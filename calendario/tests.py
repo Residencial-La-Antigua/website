@@ -187,6 +187,97 @@ class EventCreateViewTests(TestCase):
         self.assertIn("start_at", errors)
 
 
+class EventUpdateViewTests(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Jornada de siembra",
+            location="Parque central",
+            start_at=datetime(2026, 8, 20, 9, 0, tzinfo=UTC),
+        )
+
+    def update_url(self):
+        return reverse("calendario-eventos-editar", args=[self.event.pk])
+
+    def test_requires_authentication(self):
+        response = self.client.post(
+            self.update_url(),
+            {"title": "Cambiado", "start_at": "2026-08-20T09:00"},
+        )
+        self.assertEqual(response.status_code, 401)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Jornada de siembra")
+
+    def test_requires_staff(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.post(
+            self.update_url(),
+            {"title": "Cambiado", "start_at": "2026-08-20T09:00"},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Jornada de siembra")
+
+    def test_staff_can_edit_event(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            self.update_url(),
+            {
+                "title": "Jornada de siembra (reprogramada)",
+                "location": "Cancha",
+                "start_at": "2026-08-21T10:00",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Jornada de siembra (reprogramada)")
+        self.assertEqual(self.event.location, "Cancha")
+        self.assertEqual(response.json()["title"], self.event.title)
+
+    def test_edit_only_affects_this_event(self):
+        other_event = Event.objects.create(
+            title="Otro evento",
+            start_at=datetime(2026, 9, 1, 9, 0, tzinfo=UTC),
+        )
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        self.client.post(
+            self.update_url(),
+            {"title": "Cambiado", "start_at": "2026-08-20T09:00"},
+        )
+
+        other_event.refresh_from_db()
+        self.assertEqual(other_event.title, "Otro evento")
+
+    def test_missing_required_field_returns_errors_without_changing(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(self.update_url(), {"location": "Cancha"})
+
+        self.assertEqual(response.status_code, 400)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.title, "Jornada de siembra")
+        self.assertEqual(self.event.location, "Parque central")
+
+    def test_editing_nonexistent_event_returns_404(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-editar", args=[self.event.pk + 999]),
+            {"title": "Cambiado", "start_at": "2026-08-20T09:00"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
 class EventDeleteViewTests(TestCase):
     def setUp(self):
         self.event = Event.objects.create(

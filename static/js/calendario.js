@@ -55,8 +55,9 @@ document.addEventListener('DOMContentLoaded', function () {
   calendar.render();
 
   if (isStaff) {
-    setUpEventForm(calendar, createUrl);
+    setUpEventForm(calendar, createUrl, eventsUrl);
     setUpEventDelete(calendar, eventsUrl);
+    setUpEventEdit();
   }
 
   yearSelect.addEventListener('change', function () {
@@ -79,7 +80,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  var currentEvent = null;
+
   function showEventDetail(event) {
+    currentEvent = event;
     document.getElementById('event-modal-title').textContent = event.title;
     document.getElementById('event-modal-schedule').textContent =
       formatSchedule(event.start, event.end);
@@ -118,15 +122,45 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function showEventForm(dateStr) {
-    var formModal = document.getElementById('event-form-modal');
     var form = document.getElementById('event-form');
     form.reset();
     document.getElementById('event-form-errors').textContent = '';
+    document.getElementById('event-form-heading').textContent = 'Nuevo evento';
+    form.dataset.mode = 'create';
+    delete form.dataset.eventId;
     document.getElementById('event-form-start').value = dateStr + 'T09:00';
-    formModal.showModal();
+    document.getElementById('event-form-modal').showModal();
   }
 
-  function setUpEventForm(calendar, createUrl) {
+  function showEventEditForm(event) {
+    var form = document.getElementById('event-form');
+    form.reset();
+    document.getElementById('event-form-errors').textContent = '';
+    document.getElementById('event-form-heading').textContent = 'Editar evento';
+    form.dataset.mode = 'edit';
+    form.dataset.eventId = event.id;
+
+    document.getElementById('event-form-title').value = event.title;
+    document.getElementById('event-form-location').value =
+      event.extendedProps.location || '';
+    document.getElementById('event-form-description').value =
+      event.extendedProps.description || '';
+    document.getElementById('event-form-start').value = toDatetimeLocalValue(
+      event.start,
+    );
+    document.getElementById('event-form-end').value = event.end
+      ? toDatetimeLocalValue(event.end)
+      : '';
+
+    modal.close();
+    document.getElementById('event-form-modal').showModal();
+  }
+
+  function toDatetimeLocalValue(date) {
+    return date.toISOString().slice(0, 16);
+  }
+
+  function setUpEventForm(calendar, createUrl, eventsUrl) {
     var formModal = document.getElementById('event-form-modal');
     var form = document.getElementById('event-form');
     var errorsEl = document.getElementById('event-form-errors');
@@ -141,13 +175,19 @@ document.addEventListener('DOMContentLoaded', function () {
       submitEvent.preventDefault();
       errorsEl.textContent = '';
 
-      fetch(createUrl, {
+      var isEdit = form.dataset.mode === 'edit';
+      var url = isEdit
+        ? eventsUrl + form.dataset.eventId + '/editar/'
+        : createUrl;
+      var expectedStatus = isEdit ? 200 : 201;
+
+      fetch(url, {
         method: 'POST',
         headers: { 'X-CSRFToken': getCsrfToken() },
         body: new FormData(form),
       })
         .then(function (response) {
-          if (response.status === 201) {
+          if (response.status === expectedStatus) {
             formModal.close();
             form.reset();
             calendar.refetchEvents();
@@ -161,6 +201,14 @@ document.addEventListener('DOMContentLoaded', function () {
           errorsEl.textContent = formatFormErrors(data);
         });
     });
+  }
+
+  function setUpEventEdit() {
+    document
+      .getElementById('event-edit-button')
+      .addEventListener('click', function () {
+        showEventEditForm(currentEvent);
+      });
   }
 
   function resetDeleteButton(deleteButton) {

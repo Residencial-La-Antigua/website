@@ -96,6 +96,19 @@ class EventCreateView(StaffRequiredJSONMixin, View):
         return JsonResponse(serialize_event(event), status=201)
 
 
+class EventUpdateView(StaffRequiredJSONMixin, View):
+    def post(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        form = EventForm(request.POST, instance=event)
+        if not form.is_valid():
+            return JsonResponse(
+                {"errors": form.errors.get_json_data()}, status=400
+            )
+        
+        form.save()
+        return JsonResponse(serialize_event(event))
+
+
 class EventDeleteView(StaffRequiredJSONMixin, View):
     def delete(self, request, pk):
         event = get_object_or_404(Event, pk=pk)

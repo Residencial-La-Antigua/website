@@ -11,6 +11,11 @@ urlpatterns = [
         name="calendario-eventos-crear",
     ),
     path(
+        "eventos/<int:pk>/editar/",
+        views.EventUpdateView.as_view(),
+        name="calendario-eventos-editar",
+    ),
+    path(
         "eventos/<int:pk>/eliminar/",
         views.EventDeleteView.as_view(),
         name="calendario-eventos-eliminar",

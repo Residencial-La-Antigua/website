@@ -37,6 +37,9 @@
       <div class="event-form-actions">
         <button type="submit" class="btn">Cerrar</button>
         {% if user.is_staff %}
+          <button type="button" id="event-edit-button" class="btn-link">
+            Editar
+          </button>
           <button type="button" id="event-delete-button" class="btn-danger">
             Eliminar
           </button>
@@ -48,7 +51,7 @@
   {% if user.is_staff %}
     <dialog id="event-form-modal" class="event-modal">
       <form id="event-form" class="event-modal-form">
-        <h2>Nuevo evento</h2>
+        <h2 id="event-form-heading">Nuevo evento</h2>
         <p id="event-form-errors" class="event-form-errors"></p>
         <label for="event-form-title">Título</label>
         <input type="text" id="event-form-title" name="title" required />
