@@ -55,10 +55,6 @@ docker compose exec web uv run manage.py createsuperuser
 
 ### Para ambiente de producción
 
-- [ ] Configuraciones que dependen de tener HTTPS/TLS definido en todo el sitio (hosting aún por decidir) — `manage.py check --deploy` las señala todas:
-  - `SECURE_HSTS_SECONDS` (empezar con un valor corto para probar antes de subir a un año).
-  - `SECURE_SSL_REDIRECT`.
-  - `CSRF_COOKIE_SECURE` y `SESSION_COOKIE_SECURE`. Ojo: activarlas antes de tener HTTPS real rompe el envío de esas cookies, así que van junto con lo anterior, no antes.
 - [ ] Configurar `LOGGING` para producción — hoy no hay nada configurado más allá del comportamiento por defecto de Django (stdout/stderr, capturado por `docker compose logs`, sin niveles ni estructura).
 - [ ] Configurar `ADMINS`, `MANAGERS` y `EMAIL_BACKEND` — sin esto nadie recibe aviso por correo ante un error 500, y no hay de dónde enviar correos si en el futuro se agrega algo como recuperación de contraseña.
 - [ ] Agregar plantillas de error personalizadas (`404.html`, `500.html`, `403.html`, `400.html` en la raíz de `templates/`) — hoy Django sirve sus páginas de error genéricas, sin el diseño del sitio.

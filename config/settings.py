@@ -42,6 +42,18 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# With this set, Django's own-host CSRF Origin check (Origin must match
+# this request's scheme + host) works correctly behind the proxy.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Off in local dev (DEBUG=True, plain http://localhost) where they'd break
+# login: the browser refuses to store a Secure-flagged cookie over http.
+# On in production (DEBUG=False). SECURE_SSL_REDIRECT is deliberately not
+# set here: nginx already redirects HTTP to HTTPS before Django ever sees
+# the request (see DEPLOYMENT.md).
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+
 
 # Application definition
 

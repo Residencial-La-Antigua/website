@@ -50,7 +50,7 @@ La configuración vigente de Azure, nginx, TLS, Docker sin privilegios y el runn
 
 El job `deploy` hace checkout del código directamente en la VM, escribe un `.env` a partir de los secretos requeridos, construye la imagen con `docker build`, y reinicia el contenedor con `docker compose -f docker-compose.prod.yml up -d`. `docker image prune -f` al final evita que las imágenes viejas se acumulen en disco.
 
-nginx termina HTTPS y reenvía `X-Forwarded-Proto` a Django. La aplicación debe configurar `SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")` para reconocer el esquema público. Este encabezado solo es confiable mientras nginx lo sobrescriba y Gunicorn permanezca publicado exclusivamente en `127.0.0.1`.
+nginx termina HTTPS y reenvía `X-Forwarded-Proto` a Django. La aplicación debe configurar `SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")` para reconocer el esquema público. Este encabezado solo es confiable mientras nginx lo sobrescriba y Gunicorn permanezca publicado exclusivamente en `127.0.0.1`. Con esto, el chequeo de CSRF de Django ya funciona sin necesitar `CSRF_TRUSTED_ORIGINS`: Django acepta un POST cuyo `Origin` coincide con el host de la propia petición.
 
 ## Desplegar en Render
 
@@ -58,4 +58,4 @@ Render construye la imagen directamente desde el [Dockerfile](Dockerfile) i.e. n
 
 - **Language**: Docker
 - **Docker Command** (en Advanced): `sh scripts/start-prod.sh`
-- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, y `ALLOWED_HOSTS` (este último hay que agregarlo _después_ de crear el servicio, una vez que Render asigna el dominio `*.onrender.com`; de lo contrario todas las peticiones se rechazan con `DisallowedHost`).
+- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, `ALLOWED_HOSTS` — esta última hay que agregarla _después_ de crear el servicio (en caso de utilizar una solución de hosting como Render pues se debe saber cuál es el dominio). Sin `ALLOWED_HOSTS` todas las peticiones se rechazan con `DisallowedHost`.
