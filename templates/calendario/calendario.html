@@ -67,6 +67,51 @@
         <label for="event-form-end">Fecha y hora de fin (opcional)</label>
         <input type="datetime-local" id="event-form-end" name="end_at" />
 
+        <div id="event-form-recurrence-section" class="event-form-recurrence">
+          <label class="event-form-checkbox">
+            <input type="checkbox" id="event-form-is-recurring" name="is_recurring" />
+            ¿Se repite?
+          </label>
+
+          <div id="event-form-recurrence-fields" hidden>
+            <label for="event-form-frequency">Frecuencia</label>
+            <select id="event-form-frequency" name="frequency">
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
+
+            <label class="event-form-radio">
+              <input
+                type="radio"
+                name="end_type"
+                value="date"
+                id="event-form-end-type-date"
+                checked
+              />
+              Finaliza en una fecha
+            </label>
+            <input type="date" id="event-form-end-date" name="end_date" />
+
+            <label class="event-form-radio">
+              <input
+                type="radio"
+                name="end_type"
+                value="count"
+                id="event-form-end-type-count"
+              />
+              Finaliza después de un número de repeticiones
+            </label>
+            <input
+              type="number"
+              id="event-form-occurrence-count"
+              name="occurrence_count"
+              min="1"
+              max="104"
+              disabled
+            />
+          </div>
+        </div>
+
         <label for="event-form-location">Ubicación (opcional)</label>
         <input type="text" id="event-form-location" name="location" />
 

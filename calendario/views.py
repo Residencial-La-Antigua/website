@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -9,9 +10,14 @@ from django.utils.dateparse import parse_datetime
 from django.views import View
 from django.views.generic import TemplateView
 
-from .forms import EventForm
+from .forms import EventForm, RecurrenceForm
 from .mixins import LoginRequiredJSONMixin, StaffRequiredJSONMixin
 from .models import Event
+from .recurrence import (
+    MAX_OCCURRENCES,
+    TooManyOccurrences,
+    generate_occurrence_starts,
+)
 
 
 def serialize_event(event):
@@ -84,16 +90,73 @@ class EventListView(LoginRequiredJSONMixin, View):
 class EventCreateView(StaffRequiredJSONMixin, View):
     def post(self, request):
         form = EventForm(request.POST)
-        if not form.is_valid():
+        recurrence_form = RecurrenceForm(request.POST)
+
+        if not form.is_valid() or not recurrence_form.is_valid():
+            errors = form.errors.get_json_data()
+            errors.update(recurrence_form.errors.get_json_data())
+            return JsonResponse({"errors": errors}, status=400)
+
+        if not recurrence_form.cleaned_data["is_recurring"]:
+            event = form.save(commit=False)
+            event.created_by = request.user
+            event.save()
+            return JsonResponse(serialize_event(event), status=201)
+
+        try:
+            occurrence_starts = generate_occurrence_starts(
+                form.cleaned_data["start_at"],
+                recurrence_form.cleaned_data["frequency"],
+                end_date=recurrence_form.cleaned_data["end_date"],
+                occurrence_count=recurrence_form.cleaned_data[
+                    "occurrence_count"
+                ],
+            )
+        except TooManyOccurrences:
+            message = (
+                f"El rango genera demasiadas ocurrencias (máximo "
+                f"{MAX_OCCURRENCES}). Favor de reducir la fecha final."
+            )
             return JsonResponse(
-                {"errors": form.errors.get_json_data()}, status=400
+                {
+                    "errors": {
+                        "end_date": [
+                            {
+                                "message": message,
+                                "code": "too_many_occurrences",
+                            }
+                        ]
+                    }
+                },
+                status=400,
             )
 
-        event = form.save(commit=False)
-        event.created_by = request.user
-        event.save()
+        duration = None
+        if form.cleaned_data["end_at"]:
+            duration = (
+                form.cleaned_data["end_at"] - form.cleaned_data["start_at"]
+            )
 
-        return JsonResponse(serialize_event(event), status=201)
+        group = uuid.uuid4()
+        events = [
+            Event(
+                title=form.cleaned_data["title"],
+                description=form.cleaned_data["description"],
+                location=form.cleaned_data["location"],
+                start_at=occurrence_start,
+                end_at=occurrence_start + duration if duration else None,
+                recurring_group=group,
+                created_by=request.user,
+            )
+            for occurrence_start in occurrence_starts
+        ]
+        Event.objects.bulk_create(events)
+
+        return JsonResponse(
+            [serialize_event(event) for event in events],
+            safe=False,
+            status=201,
+        )
 
 
 class EventUpdateView(StaffRequiredJSONMixin, View):
@@ -104,7 +167,7 @@ class EventUpdateView(StaffRequiredJSONMixin, View):
             return JsonResponse(
                 {"errors": form.errors.get_json_data()}, status=400
             )
-        
+
         form.save()
         return JsonResponse(serialize_event(event))
 

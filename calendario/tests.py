@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -7,6 +7,11 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import Confirmation, Event
+from .recurrence import (
+    MAX_OCCURRENCES,
+    TooManyOccurrences,
+    generate_occurrence_starts,
+)
 
 User = get_user_model()
 
@@ -185,6 +190,189 @@ class EventCreateViewTests(TestCase):
         errors = response.json()["errors"]
         self.assertIn("title", errors)
         self.assertIn("start_at", errors)
+
+    def test_recurring_weekly_with_count_creates_one_row_per_occurrence(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Patrullaje",
+                "start_at": "2026-08-03T18:00",
+                "is_recurring": "on",
+                "frequency": "weekly",
+                "occurrence_count": "3",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Event.objects.count(), 3)
+        events = list(Event.objects.order_by("start_at"))
+        self.assertEqual(
+            [e.start_at.date().isoformat() for e in events],
+            ["2026-08-03", "2026-08-10", "2026-08-17"],
+        )
+        self.assertEqual(len({e.recurring_group for e in events}), 1)
+        self.assertIsNotNone(events[0].recurring_group)
+        self.assertEqual(len(response.json()), 3)
+
+    def test_recurring_monthly_with_end_date(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Reunión de junta",
+                "start_at": "2026-01-31T18:00",
+                "is_recurring": "on",
+                "frequency": "monthly",
+                "end_date": "2026-05-01",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        events = list(Event.objects.order_by("start_at"))
+        # Jan 31 + 1 month clamps to Feb 28 (2026 is not a leap year), then
+        # Mar 31, then Apr 30 (April only has 30 days), then May 31 would
+        # exceed the May 1 end_date so it stops.
+        self.assertEqual(
+            [e.start_at.date().isoformat() for e in events],
+            ["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"],
+        )
+
+    def test_recurring_preserves_duration_across_occurrences(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Café con vecinos",
+                "start_at": "2026-08-03T18:00",
+                "end_at": "2026-08-03T19:30",
+                "is_recurring": "on",
+                "frequency": "weekly",
+                "occurrence_count": "2",
+            },
+        )
+
+        events = list(Event.objects.order_by("start_at"))
+        for event in events:
+            assert event.end_at is not None
+            self.assertEqual(
+                event.end_at - event.start_at, timedelta(hours=1, minutes=30)
+            )
+
+    def test_recurring_requires_frequency(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Patrullaje",
+                "start_at": "2026-08-03T18:00",
+                "is_recurring": "on",
+                "occurrence_count": "3",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+        self.assertIn("frequency", response.json()["errors"])
+
+    def test_recurring_rejects_both_end_conditions(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Patrullaje",
+                "start_at": "2026-08-03T18:00",
+                "is_recurring": "on",
+                "frequency": "weekly",
+                "occurrence_count": "3",
+                "end_date": "2026-09-01",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+
+    def test_recurring_rejects_neither_end_condition(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Patrullaje",
+                "start_at": "2026-08-03T18:00",
+                "is_recurring": "on",
+                "frequency": "weekly",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+
+    def test_recurring_exceeding_cap_returns_error_without_creating(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Patrullaje",
+                "start_at": "2026-08-03T18:00",
+                "is_recurring": "on",
+                "frequency": "weekly",
+                "end_date": "2030-01-01",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+        self.assertIn("end_date", response.json()["errors"])
+
+
+class RecurrenceGenerationTests(TestCase):
+    def test_weekly_with_count(self):
+        start = datetime(2026, 8, 3, 18, 0, tzinfo=UTC)
+        occurrences = generate_occurrence_starts(
+            start, "weekly", occurrence_count=3
+        )
+        self.assertEqual(
+            [o.date().isoformat() for o in occurrences],
+            ["2026-08-03", "2026-08-10", "2026-08-17"],
+        )
+
+    def test_monthly_with_end_date_clamps_day_of_month(self):
+        start = datetime(2026, 1, 31, 9, 0, tzinfo=UTC)
+        occurrences = generate_occurrence_starts(
+            start, "monthly", end_date=date(2026, 4, 1)
+        )
+        self.assertEqual(
+            [o.date().isoformat() for o in occurrences],
+            ["2026-01-31", "2026-02-28", "2026-03-31"],
+        )
+
+    def test_raises_when_exceeding_cap(self):
+        start = datetime(2026, 1, 1, 9, 0, tzinfo=UTC)
+        with self.assertRaises(TooManyOccurrences):
+            generate_occurrence_starts(
+                start, "weekly", end_date=date(2030, 1, 1)
+            )
+
+    def test_occurrence_count_at_exactly_the_cap_is_allowed(self):
+        start = datetime(2026, 1, 1, 9, 0, tzinfo=UTC)
+        occurrences = generate_occurrence_starts(
+            start, "weekly", occurrence_count=MAX_OCCURRENCES
+        )
+        self.assertEqual(len(occurrences), MAX_OCCURRENCES)
 
 
 class EventUpdateViewTests(TestCase):

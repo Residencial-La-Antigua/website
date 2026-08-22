@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setUpEventForm(calendar, createUrl, eventsUrl);
     setUpEventDelete(calendar, eventsUrl);
     setUpEventEdit();
+    setUpRecurrenceFields();
   }
 
   yearSelect.addEventListener('change', function () {
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
     form.dataset.mode = 'create';
     delete form.dataset.eventId;
     document.getElementById('event-form-start').value = dateStr + 'T09:00';
+    resetRecurrenceFields();
     document.getElementById('event-form-modal').showModal();
   }
 
@@ -139,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('event-form-heading').textContent = 'Editar evento';
     form.dataset.mode = 'edit';
     form.dataset.eventId = event.id;
+    document.getElementById('event-form-recurrence-section').hidden = true;
 
     document.getElementById('event-form-title').value = event.title;
     document.getElementById('event-form-location').value =
@@ -200,6 +203,40 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(function (data) {
           errorsEl.textContent = formatFormErrors(data);
         });
+    });
+  }
+
+  function resetRecurrenceFields() {
+    document.getElementById('event-form-recurrence-section').hidden = false;
+    document.getElementById('event-form-recurrence-fields').hidden = true;
+    document.getElementById('event-form-end-date').disabled = false;
+    document.getElementById('event-form-occurrence-count').disabled = true;
+  }
+
+  function setUpRecurrenceFields() {
+    var checkbox = document.getElementById('event-form-is-recurring');
+    var fields = document.getElementById('event-form-recurrence-fields');
+    var endDateInput = document.getElementById('event-form-end-date');
+    var occurrenceCountInput = document.getElementById(
+      'event-form-occurrence-count',
+    );
+    var endTypeDate = document.getElementById('event-form-end-type-date');
+    var endTypeRadios = document.getElementsByName('end_type');
+
+    checkbox.addEventListener('change', function () {
+      fields.hidden = !checkbox.checked;
+    });
+
+    Array.prototype.forEach.call(endTypeRadios, function (radio) {
+      radio.addEventListener('change', function () {
+        endDateInput.disabled = !endTypeDate.checked;
+        occurrenceCountInput.disabled = endTypeDate.checked;
+        if (endTypeDate.checked) {
+          occurrenceCountInput.value = '';
+        } else {
+          endDateInput.value = '';
+        }
+      });
     });
   }
 
