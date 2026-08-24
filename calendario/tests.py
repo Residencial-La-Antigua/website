@@ -1,3 +1,4 @@
+import uuid
 from datetime import UTC, date, datetime, timedelta
 
 from django.conf import settings
@@ -516,6 +517,121 @@ class EventDeleteViewTests(TestCase):
 
         response = self.client.delete(
             reverse("calendario-eventos-eliminar", args=[self.event.pk + 999])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+class EventDeleteSeriesViewTests(TestCase):
+    def setUp(self):
+        self.group = uuid.uuid4()
+        self.past = Event.objects.create(
+            title="Patrullaje (pasado)",
+            start_at=datetime(2026, 7, 1, 18, 0, tzinfo=UTC),
+            recurring_group=self.group,
+        )
+        self.current = Event.objects.create(
+            title="Patrullaje (actual)",
+            start_at=datetime(2026, 8, 1, 18, 0, tzinfo=UTC),
+            recurring_group=self.group,
+        )
+        self.future = Event.objects.create(
+            title="Patrullaje (futuro)",
+            start_at=datetime(2026, 9, 1, 18, 0, tzinfo=UTC),
+            recurring_group=self.group,
+        )
+
+    def delete_series_url(self, event=None):
+        return reverse(
+            "calendario-eventos-eliminar-serie",
+            args=[(event or self.current).pk],
+        )
+
+    def test_requires_authentication(self):
+        response = self.client.delete(self.delete_series_url())
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(Event.objects.count(), 3)
+
+    def test_requires_staff(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.delete(self.delete_series_url())
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Event.objects.count(), 3)
+
+    def test_deletes_current_and_future_but_not_past(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.delete(self.delete_series_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(Event.objects.filter(pk=self.past.pk).exists())
+        self.assertFalse(Event.objects.filter(pk=self.current.pk).exists())
+        self.assertFalse(Event.objects.filter(pk=self.future.pk).exists())
+
+    def test_does_not_affect_events_in_other_groups(self):
+        other_group_event = Event.objects.create(
+            title="Otra serie",
+            start_at=datetime(2026, 9, 15, 18, 0, tzinfo=UTC),
+            recurring_group=uuid.uuid4(),
+        )
+        unrelated_event = Event.objects.create(
+            title="Evento suelto",
+            start_at=datetime(2026, 9, 20, 18, 0, tzinfo=UTC),
+        )
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        self.client.delete(self.delete_series_url())
+
+        self.assertTrue(Event.objects.filter(pk=other_group_event.pk).exists())
+        self.assertTrue(Event.objects.filter(pk=unrelated_event.pk).exists())
+
+    def test_deleting_series_cascades_confirmations(self):
+        resident = create_user("residente")
+        Confirmation.objects.create(user=resident, event=self.future)
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        self.client.delete(self.delete_series_url())
+
+        self.assertEqual(Confirmation.objects.count(), 0)
+
+    def test_non_recurring_event_falls_back_to_single_delete(self):
+        standalone = Event.objects.create(
+            title="Evento único",
+            start_at=datetime(2026, 8, 15, 18, 0, tzinfo=UTC),
+        )
+        # Also recurring_group=None, and starts after `standalone`.
+        # A naive `filter(recurring_group=event.recurring_group,
+        # start_at__gte=event.start_at)` (without the `is None` special
+        # case) would match both of these and delete them together.
+        later_standalone = Event.objects.create(
+            title="Otro evento único",
+            start_at=datetime(2026, 8, 20, 18, 0, tzinfo=UTC),
+        )
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.delete(self.delete_series_url(standalone))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Event.objects.filter(pk=standalone.pk).exists())
+        self.assertTrue(Event.objects.filter(pk=later_standalone.pk).exists())
+        self.assertEqual(Event.objects.count(), 4)
+
+    def test_deleting_nonexistent_event_returns_404(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.delete(
+            reverse(
+                "calendario-eventos-eliminar-serie",
+                args=[self.future.pk + 999],
+            )
         )
 
         self.assertEqual(response.status_code, 404)

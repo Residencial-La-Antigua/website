@@ -29,6 +29,9 @@ def serialize_event(event):
         "extendedProps": {
             "description": event.description,
             "location": event.location,
+            "recurringGroup": str(event.recurring_group)
+            if event.recurring_group
+            else None,
         },
     }
 
@@ -176,4 +179,21 @@ class EventDeleteView(StaffRequiredJSONMixin, View):
     def delete(self, request, pk):
         event = get_object_or_404(Event, pk=pk)
         event.delete()
+        return HttpResponse(status=204)
+
+
+class EventDeleteSeriesView(StaffRequiredJSONMixin, View):
+    """Deletes this occurrence and every later one (by start_at) sharing
+    its recurring_group. Past occurrences in the same series, and events
+    outside the series, are untouched."""
+
+    def delete(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        if event.recurring_group is None:
+            event.delete()
+        else:
+            Event.objects.filter(
+                recurring_group=event.recurring_group,
+                start_at__gte=event.start_at,
+            ).delete()
         return HttpResponse(status=204)

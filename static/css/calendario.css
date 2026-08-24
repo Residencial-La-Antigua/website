@@ -139,6 +139,14 @@
   margin-top: 0.5rem;
 }
 
+.event-form-actions-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
 .btn-danger {
   display: inline-block;
   font-family: inherit;

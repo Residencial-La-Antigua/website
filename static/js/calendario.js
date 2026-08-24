@@ -99,8 +99,22 @@ document.addEventListener('DOMContentLoaded', function () {
       description || 'Sin descripción.';
 
     modal.dataset.eventId = event.id;
+
+    var isRecurring = !!event.extendedProps.recurringGroup;
     var deleteButton = document.getElementById('event-delete-button');
-    if (deleteButton) resetDeleteButton(deleteButton);
+    var deleteSeriesButton = document.getElementById(
+      'event-delete-series-button',
+    );
+    if (deleteButton) {
+      resetConfirmButton(
+        deleteButton,
+        isRecurring ? 'Eliminar solo este' : 'Eliminar',
+      );
+    }
+    if (deleteSeriesButton) {
+      deleteSeriesButton.hidden = !isRecurring;
+      resetConfirmButton(deleteSeriesButton, 'Eliminar este y los futuros');
+    }
 
     modal.showModal();
   }
@@ -248,23 +262,39 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 
-  function resetDeleteButton(deleteButton) {
-    deleteButton.textContent = 'Eliminar';
-    deleteButton.removeAttribute('data-confirming');
+  function resetConfirmButton(button, defaultText) {
+    button.textContent = defaultText;
+    button.removeAttribute('data-confirming');
   }
 
   function setUpEventDelete(calendar, eventsUrl) {
-    var deleteButton = document.getElementById('event-delete-button');
+    setUpTwoStepDeleteButton(
+      document.getElementById('event-delete-button'),
+      'Confirmar eliminación',
+      function (eventId) {
+        return eventsUrl + eventId + '/eliminar/';
+      },
+      calendar,
+    );
+    setUpTwoStepDeleteButton(
+      document.getElementById('event-delete-series-button'),
+      'Confirmar eliminación de la serie',
+      function (eventId) {
+        return eventsUrl + eventId + '/eliminar-serie/';
+      },
+      calendar,
+    );
+  }
 
-    deleteButton.addEventListener('click', function () {
-      if (deleteButton.dataset.confirming !== 'true') {
-        deleteButton.dataset.confirming = 'true';
-        deleteButton.textContent = 'Confirmar eliminación';
+  function setUpTwoStepDeleteButton(button, confirmText, buildUrl, calendar) {
+    button.addEventListener('click', function () {
+      if (button.dataset.confirming !== 'true') {
+        button.dataset.confirming = 'true';
+        button.textContent = confirmText;
         return;
       }
 
-      var eventId = modal.dataset.eventId;
-      fetch(eventsUrl + eventId + '/eliminar/', {
+      fetch(buildUrl(modal.dataset.eventId), {
         method: 'DELETE',
         headers: { 'X-CSRFToken': getCsrfToken() },
       }).then(function (response) {

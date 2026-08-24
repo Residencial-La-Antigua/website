@@ -40,8 +40,20 @@
           <button type="button" id="event-edit-button" class="btn-link">
             Editar
           </button>
+        {% endif %}
+      </div>
+      <div class="event-form-actions-stacked">
+        {% if user.is_staff %}
           <button type="button" id="event-delete-button" class="btn-danger">
             Eliminar
+          </button>
+          <button
+            type="button"
+            id="event-delete-series-button"
+            class="btn-danger"
+            hidden
+          >
+            Eliminar este y futuros
           </button>
         {% endif %}
       </div>
