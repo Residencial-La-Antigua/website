@@ -163,6 +163,10 @@
     color 0.15s ease;
 }
 
+.btn-danger[hidden] {
+  display: none;
+}
+
 .btn-danger:hover,
 .btn-danger[data-confirming='true'] {
   background-color: var(--color-error-text);
