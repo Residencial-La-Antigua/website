@@ -26,6 +26,7 @@ El conjunto de funcionalidades se ha organizado en 7 módulos funcionales:
 
 - **Autenticación de vecinos:** registro de cuentas, aprobación por administrador antes de poder iniciar sesión, e inicio/cierre de sesión.
 - **Información básica:** páginas de referencia con teléfonos importantes, recolección de basura y reciclaje, y desechos no tradicionales.
+- **Calendario de eventos:** vista mensual navegable por mes y año, creación y edición de eventos únicos o recurrentes (diarios, semanales o mensuales) por parte de administradores, y confirmación o cancelación de asistencia por parte de los vecinos, con historial de confirmaciones consultable desde el panel de administración.
 
 ## Cómo contribuir
 
