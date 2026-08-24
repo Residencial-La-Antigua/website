@@ -12,7 +12,7 @@ from django.views.generic import TemplateView
 
 from .forms import EventForm, RecurrenceForm
 from .mixins import LoginRequiredJSONMixin, StaffRequiredJSONMixin
-from .models import Event
+from .models import Confirmation, Event
 from .recurrence import (
     MAX_OCCURRENCES,
     TooManyOccurrences,
@@ -20,7 +20,7 @@ from .recurrence import (
 )
 
 
-def serialize_event(event):
+def serialize_event(event, is_confirmed):
     return {
         "id": event.id,
         "title": event.title,
@@ -32,6 +32,7 @@ def serialize_event(event):
             "recurringGroup": str(event.recurring_group)
             if event.recurring_group
             else None,
+            "confirmed": is_confirmed,
         },
     }
 
@@ -51,12 +52,24 @@ class EventListView(LoginRequiredJSONMixin, View):
         if start is None or end is None:
             start, end = self._current_month_range()
 
-        events = Event.objects.filter(start_at__lt=end).filter(
-            Q(end_at__gt=start) | Q(end_at__isnull=True, start_at__gte=start)
+        events = list(
+            Event.objects.filter(start_at__lt=end).filter(
+                Q(end_at__gt=start)
+                | Q(end_at__isnull=True, start_at__gte=start)
+            )
+        )
+        confirmed_ids = set(
+            Confirmation.objects.filter(
+                user=request.user, event__in=events
+            ).values_list("event_id", flat=True)
         )
 
         return JsonResponse(
-            [serialize_event(event) for event in events], safe=False
+            [
+                serialize_event(event, event.id in confirmed_ids)
+                for event in events
+            ],
+            safe=False,
         )
 
     @staticmethod
@@ -104,7 +117,7 @@ class EventCreateView(StaffRequiredJSONMixin, View):
             event = form.save(commit=False)
             event.created_by = request.user
             event.save()
-            return JsonResponse(serialize_event(event), status=201)
+            return JsonResponse(serialize_event(event, False), status=201)
 
         try:
             occurrence_starts = generate_occurrence_starts(
@@ -156,7 +169,7 @@ class EventCreateView(StaffRequiredJSONMixin, View):
         Event.objects.bulk_create(events)
 
         return JsonResponse(
-            [serialize_event(event) for event in events],
+            [serialize_event(event, False) for event in events],
             safe=False,
             status=201,
         )
@@ -172,7 +185,8 @@ class EventUpdateView(StaffRequiredJSONMixin, View):
             )
 
         form.save()
-        return JsonResponse(serialize_event(event))
+        is_confirmed = event.confirmations.filter(user=request.user).exists()
+        return JsonResponse(serialize_event(event, is_confirmed))
 
 
 class EventDeleteView(StaffRequiredJSONMixin, View):
@@ -196,4 +210,21 @@ class EventDeleteSeriesView(StaffRequiredJSONMixin, View):
                 recurring_group=event.recurring_group,
                 start_at__gte=event.start_at,
             ).delete()
+        return HttpResponse(status=204)
+
+
+class EventConfirmView(LoginRequiredJSONMixin, View):
+    """Toggles the requesting user's attendance confirmation for an event.
+    Open to any authenticated resident, not just staff. Both directions
+    are idempotent: confirming twice or cancelling a confirmation that
+    doesn't exist both succeed without error."""
+
+    def post(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        Confirmation.objects.get_or_create(user=request.user, event=event)
+        return JsonResponse(serialize_event(event, True))
+
+    def delete(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        Confirmation.objects.filter(user=request.user, event=event).delete()
         return HttpResponse(status=204)

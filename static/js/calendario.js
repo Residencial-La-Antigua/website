@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   calendar.render();
 
+  setUpEventConfirm(eventsUrl);
+
   if (isStaff) {
     setUpEventForm(calendar, createUrl, eventsUrl);
     setUpEventDelete(calendar, eventsUrl);
@@ -99,6 +101,11 @@ document.addEventListener('DOMContentLoaded', function () {
       description || 'Sin descripción.';
 
     modal.dataset.eventId = event.id;
+
+    setConfirmButtonState(
+      document.getElementById('event-confirm-button'),
+      !!event.extendedProps.confirmed,
+    );
 
     var isRecurring = !!event.extendedProps.recurringGroup;
     var deleteButton = document.getElementById('event-delete-button');
@@ -265,6 +272,39 @@ document.addEventListener('DOMContentLoaded', function () {
   function resetConfirmButton(button, defaultText) {
     button.textContent = defaultText;
     button.removeAttribute('data-confirming');
+  }
+
+  function setConfirmButtonState(button, isConfirmed) {
+    button.dataset.confirmed = isConfirmed ? 'true' : 'false';
+    button.textContent = isConfirmed
+      ? 'Cancelar confirmación'
+      : 'Confirmar asistencia';
+  }
+
+  function setUpEventConfirm(eventsUrl) {
+    var confirmButton = document.getElementById('event-confirm-button');
+
+    confirmButton.addEventListener('click', function () {
+      var isConfirmed = confirmButton.dataset.confirmed === 'true';
+      var method = isConfirmed ? 'DELETE' : 'POST';
+
+      fetch(eventsUrl + modal.dataset.eventId + '/confirmar/', {
+        method: method,
+        headers: { 'X-CSRFToken': getCsrfToken() },
+      }).then(function (response) {
+        if (response.ok) {
+          setConfirmButtonState(confirmButton, !isConfirmed);
+          // FullCalendar keeps its own cached copy of each event's
+          // extendedProps, reused as-is (no refetch) when the same event
+          // is clicked again. Without updating it here too, reopening
+          // this event later in the same page session would read the
+          // stale pre-confirm value and reset the button incorrectly.
+          if (currentEvent) {
+            currentEvent.setExtendedProp('confirmed', !isConfirmed);
+          }
+        }
+      });
+    });
   }
 
   function setUpEventDelete(calendar, eventsUrl) {

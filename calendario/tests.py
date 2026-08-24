@@ -119,6 +119,19 @@ class EventListViewTests(TestCase):
         self.assertIn("Este mes", titles)
         self.assertNotIn("Otro mes", titles)
 
+    def test_confirmed_flag_is_specific_to_the_requesting_user(self):
+        event = Event.objects.create(
+            title="Café con vecinos", start_at=timezone.now()
+        )
+        other_resident = create_user("otro_residente")
+        Confirmation.objects.create(user=other_resident, event=event)
+
+        response = self.client.get(reverse("calendario-eventos"))
+
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertFalse(data[0]["extendedProps"]["confirmed"])
+
 
 class EventCreateViewTests(TestCase):
     def test_requires_authentication(self):
@@ -632,6 +645,101 @@ class EventDeleteSeriesViewTests(TestCase):
                 "calendario-eventos-eliminar-serie",
                 args=[self.future.pk + 999],
             )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+class EventConfirmViewTests(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Café con vecinos",
+            start_at=datetime(2026, 8, 20, 18, 0, tzinfo=UTC),
+        )
+
+    def confirm_url(self):
+        return reverse("calendario-eventos-confirmar", args=[self.event.pk])
+
+    def test_requires_authentication(self):
+        response = self.client.post(self.confirm_url())
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(Confirmation.objects.count(), 0)
+
+    def test_resident_can_confirm(self):
+        resident = create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.post(self.confirm_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["extendedProps"]["confirmed"])
+        self.assertTrue(
+            Confirmation.objects.filter(
+                user=resident, event=self.event
+            ).exists()
+        )
+
+    def test_staff_can_also_confirm(self):
+        # Confirming attendance isn't a staff-only action - any
+        # authenticated resident, staff or not, can do it.
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(self.confirm_url())
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_confirming_twice_is_idempotent(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        self.client.post(self.confirm_url())
+        response = self.client.post(self.confirm_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Confirmation.objects.count(), 1)
+
+    def test_resident_can_cancel_confirmation(self):
+        resident = create_user("residente")
+        Confirmation.objects.create(user=resident, event=self.event)
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.delete(self.confirm_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Confirmation.objects.exists())
+
+    def test_cancelling_when_not_confirmed_is_a_noop(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.delete(self.confirm_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Confirmation.objects.count(), 0)
+
+    def test_one_users_confirmation_does_not_affect_another(self):
+        resident_a = create_user("residente_a")
+        resident_b = create_user("residente_b")
+        Confirmation.objects.create(user=resident_a, event=self.event)
+
+        self.client.login(
+            username=resident_b.username, password="clave-segura-123"
+        )
+        self.client.delete(self.confirm_url())
+
+        self.assertTrue(
+            Confirmation.objects.filter(
+                user=resident_a, event=self.event
+            ).exists()
+        )
+
+    def test_confirming_nonexistent_event_returns_404(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-confirmar", args=[self.event.pk + 999])
         )
 
         self.assertEqual(response.status_code, 404)

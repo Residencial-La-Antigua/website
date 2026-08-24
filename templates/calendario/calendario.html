@@ -24,9 +24,11 @@
     ></div>
   </div>
 
-  {% if user.is_staff %}
-    <form id="csrf-form" style="display: none">{% csrf_token %}</form>
-  {% endif %}
+  {% comment %}
+  Every visitor here is authenticated (CalendarView requires login). 
+  Confirming attendance is a resident action.
+  {% endcomment %}
+  <form id="csrf-form" style="display: none">{% csrf_token %}</form>
 
   <dialog id="event-modal" class="event-modal">
     <form method="dialog" class="event-modal-form">
@@ -36,14 +38,15 @@
       <p id="event-modal-description" class="event-modal-description"></p>
       <div class="event-form-actions">
         <button type="submit" class="btn">Cerrar</button>
+        <button type="button" id="event-confirm-button" class="btn-link">
+          Confirmar asistencia
+        </button>
+      </div>
+      <div class="event-form-actions-stacked">
         {% if user.is_staff %}
           <button type="button" id="event-edit-button" class="btn-link">
             Editar
           </button>
-        {% endif %}
-      </div>
-      <div class="event-form-actions-stacked">
-        {% if user.is_staff %}
           <button type="button" id="event-delete-button" class="btn-danger">
             Eliminar
           </button>
