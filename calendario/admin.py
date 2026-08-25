@@ -5,9 +5,9 @@ from .models import Confirmation, Event
 
 class ConfirmationInline(admin.TabularInline):
     """Read-only attendance-confirmation history for a user, shown inline
-    on their own admin page. Existing rows can be deleted (an admin can 
-    correct the record when someone confirmed but didn't attend), but 
-    nothing here is editable and no new rows can be added through this 
+    on their own admin page. Existing rows can be deleted (an admin can
+    correct the record when someone confirmed but didn't attend), but
+    nothing here is editable and no new rows can be added through this
     inline i.e. this view is not a way to fabricate confirmations."""
 
     model = Confirmation

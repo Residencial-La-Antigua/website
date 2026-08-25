@@ -40,9 +40,9 @@ def generate_occurrence_starts(
 
 def _shift(start_at, frequency, index):
     # `index` counts occurrences from start_at, not from the previous one
-    # - always shifting the original date is what keeps a clamped month 
+    # - always shifting the original date is what keeps a clamped month
     # from dragging every later occurrence down with it. `else` stands in
-    # for "monthly": RecurrenceForm's frequency field only offers 
+    # for "monthly": RecurrenceForm's frequency field only offers
     # "weekly"/"monthly". Update this function if that ever changes.
     if frequency == "weekly":
         return start_at + datetime.timedelta(weeks=index)
