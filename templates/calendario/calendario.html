@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Calendario — Residencial La Antigua{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/calendario.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="card calendar-card">
+    <header>
+      <h1>Calendario de Eventos</h1>
+      <div class="calendar-controls">
+        <label for="year-select">Año</label>
+        <select id="year-select"></select>
+      </div>
+    </header>
+    <div
+      id="calendar"
+      data-events-url="{% url 'calendario-eventos' %}"
+      data-create-url="{% url 'calendario-eventos-crear' %}"
+      data-is-staff="{{ user.is_staff|yesno:'true,false' }}"
+    ></div>
+  </div>
+
+  {% comment %}
+  Every visitor here is authenticated (CalendarView requires login). 
+  Confirming attendance is a resident action.
+  {% endcomment %}
+  <form id="csrf-form" style="display: none">{% csrf_token %}</form>
+
+  <dialog id="event-modal" class="event-modal">
+    <form method="dialog" class="event-modal-form">
+      <h2 id="event-modal-title"></h2>
+      <p id="event-modal-schedule" class="event-modal-schedule"></p>
+      <p id="event-modal-location" class="event-modal-location"></p>
+      <p id="event-modal-description" class="event-modal-description"></p>
+      <div class="event-form-actions">
+        <button type="submit" class="btn">Cerrar</button>
+        <button type="button" id="event-confirm-button" class="btn-link">
+          Confirmar asistencia
+        </button>
+      </div>
+      <div class="event-form-actions-stacked">
+        {% if user.is_staff %}
+          <button type="button" id="event-edit-button" class="btn-link">
+            Editar
+          </button>
+          <button type="button" id="event-delete-button" class="btn-danger">
+            Eliminar
+          </button>
+          <button
+            type="button"
+            id="event-delete-series-button"
+            class="btn-danger"
+            hidden
+          >
+            Eliminar este y futuros
+          </button>
+        {% endif %}
+      </div>
+    </form>
+  </dialog>
+
+  {% if user.is_staff %}
+    <dialog id="event-form-modal" class="event-modal">
+      <form id="event-form" class="event-modal-form">
+        <h2 id="event-form-heading">Nuevo evento</h2>
+        <p id="event-form-errors" class="event-form-errors"></p>
+        <label for="event-form-title">Título</label>
+        <input type="text" id="event-form-title" name="title" required />
+
+        <label for="event-form-start">Fecha y hora de inicio</label>
+        <input
+          type="datetime-local"
+          id="event-form-start"
+          name="start_at"
+          required
+        />
+
+        <label for="event-form-end">Fecha y hora de fin (opcional)</label>
+        <input type="datetime-local" id="event-form-end" name="end_at" />
+
+        <div id="event-form-recurrence-section" class="event-form-recurrence">
+          <label class="event-form-checkbox">
+            <input type="checkbox" id="event-form-is-recurring" name="is_recurring" />
+            ¿Se repite?
+          </label>
+
+          <div id="event-form-recurrence-fields" hidden>
+            <label for="event-form-frequency">Frecuencia</label>
+            <select id="event-form-frequency" name="frequency">
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
+
+            <label class="event-form-radio">
+              <input
+                type="radio"
+                name="end_type"
+                value="date"
+                id="event-form-end-type-date"
+                checked
+              />
+              Finaliza en una fecha
+            </label>
+            <input type="date" id="event-form-end-date" name="end_date" />
+
+            <label class="event-form-radio">
+              <input
+                type="radio"
+                name="end_type"
+                value="count"
+                id="event-form-end-type-count"
+              />
+              Finaliza después de un número de repeticiones
+            </label>
+            <input
+              type="number"
+              id="event-form-occurrence-count"
+              name="occurrence_count"
+              min="1"
+              max="104"
+              disabled
+            />
+          </div>
+        </div>
+
+        <label for="event-form-location">Ubicación (opcional)</label>
+        <input type="text" id="event-form-location" name="location" />
+
+        <label for="event-form-description">Descripción (opcional)</label>
+        <textarea id="event-form-description" name="description"></textarea>
+
+        <div class="event-form-actions">
+          <button type="submit" class="btn">Guardar</button>
+          <button type="button" class="btn-link" data-close-event-form>
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </dialog>
+  {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales/es.global.min.js"></script>
+  <script src="{% static 'js/calendario.js' %}"></script>
+{% endblock %}

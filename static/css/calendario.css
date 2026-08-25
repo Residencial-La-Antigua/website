@@ -1,0 +1,212 @@
+.calendar-card {
+  max-width: 960px;
+  padding: 1.5rem;
+}
+
+.calendar-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.calendar-card h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25em;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+.calendar-controls label {
+  margin-bottom: 0;
+}
+
+.calendar-controls select {
+  width: auto;
+}
+
+#calendar {
+  font-family: inherit;
+}
+
+#calendar .fc-toolbar {
+  flex-direction: row-reverse;
+}
+
+#calendar .fc-toolbar-title {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+#calendar .fc-toolbar-title::first-letter {
+  text-transform: uppercase;
+}
+
+#calendar .fc-toolbar-chunk:last-child {
+  display: none;
+}
+
+#calendar .fc-col-header-cell-cushion,
+#calendar .fc-daygrid-day-number {
+  text-decoration: none;
+}
+
+#calendar.is-staff .fc-daygrid-day:hover {
+  background-color: var(--color-success-bg);
+  cursor: pointer;
+}
+
+#calendar .fc-event {
+  cursor: pointer;
+  color: var(--color-text-light);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+#calendar .fc-button-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+#calendar .fc-button-primary:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.event-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  max-width: 420px;
+  width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--color-text);
+}
+
+.event-modal::backdrop {
+  background-color: rgba(42, 42, 37, 0.5);
+}
+
+.event-modal-form h2 {
+  margin-top: 0;
+}
+
+.event-modal-form label + input {
+  margin-bottom: 0.75rem;
+}
+
+.event-modal-schedule {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.event-modal-location {
+  color: var(--color-text-muted);
+}
+
+.event-modal-description {
+  white-space: pre-line;
+}
+
+.event-form-errors {
+  color: var(--color-error-text);
+  font-size: 0.875rem;
+}
+
+.event-form-errors:empty {
+  display: none;
+}
+
+.event-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.event-form-actions-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-danger {
+  display: inline-block;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-error-text);
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--color-error-text);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.btn-danger[hidden] {
+  display: none;
+}
+
+.btn-danger:hover,
+.btn-danger[data-confirming='true'] {
+  background-color: var(--color-error-text);
+  color: #fff;
+}
+
+.event-form-recurrence {
+  margin-bottom: 1.1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.event-form-checkbox,
+.event-form-radio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+.event-form-checkbox {
+  margin-bottom: 0;
+}
+
+.event-form-checkbox input,
+.event-form-radio input {
+  width: auto;
+}
+
+#event-form-recurrence-fields {
+  margin-top: 0.5rem;
+}
+
+#event-form-recurrence-fields select,
+#event-form-recurrence-fields input {
+  margin-bottom: 0.75rem;
+}
+
+#event-form-recurrence-fields input[type='radio'] {
+  margin-bottom: 0;
+}

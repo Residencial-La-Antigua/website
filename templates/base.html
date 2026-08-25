@@ -21,6 +21,7 @@
       <nav class="site-nav">
         {% if user.is_authenticated %}
         <span class="greeting">Hola, {{ user.username }}</span>
+        <a href="{% url 'calendario' %}">Calendario</a>
         <a href="{% url 'profile' %}">Mi cuenta</a>
         <form method="post" action="{% url 'logout' %}" style="display: inline">
           {% csrf_token %}
@@ -46,5 +47,6 @@
     <footer>
       Desarrollado con ❤️ por y para los residentes de Residencial La Antigua 🌿
     </footer>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>

@@ -40,6 +40,12 @@ El arranque real para producción (`collectstatic` → `migrate` → Gunicorn) s
 
 La app escucha en el puerto definido por la variable de entorno `PORT` (por defecto `8000`). Esto es para compatibilidad con plataformas como Render que asignan su propio puerto dinámicamente.
 
+### Concurrencia (workers de Gunicorn)
+
+[scripts/start-prod.sh](scripts/start-prod.sh) arranca Gunicorn con `--workers 3` y la clase de worker por defecto (`sync`). Cada worker es un proceso de sistema operativo independiente que atiende **una petición a la vez**. Con 3 workers, la app procesa como máximo 3 peticiones simultáneas; cualquier petición adicional espera en cola a nivel del socket hasta que un worker quede libre. Cada worker maneja su propia petición de forma totalmente independiente.
+
+Gunicorn no impone un máximo de workers; su documentación sugiere `(2 × cores) + 1` como punto de partida. Si la concurrencia real llegara a ser un cuello de botella, las dos palancas estándar serían aumentar `--workers` (limitado por CPU/RAM disponibles, ya que cada worker carga su propia copia completa de la app) o cambiar a una clase de worker con hilos o async (`gthread`, `gevent`), que permite que un mismo worker atienda varias peticiones en vuelo a la vez.
+
 ## Despliegue automático (GitHub Actions + VM de Azure)
 
 [.github/workflows/deploy.yml](.github/workflows/deploy.yml) despliega automáticamente a una VM de Azure en cada push a `main`. El job `deploy` corre en un **runner autohospedado (self-hosted) instalado directamente en la VM**, no en un runner de GitHub. Con un runner autohospedado, el job corre localmente en la VM: no hace falta abrir el puerto 22 a GitHub ni manejar llaves SSH en absoluto.
