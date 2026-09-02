@@ -155,6 +155,23 @@ class EventListViewTests(TestCase):
         self.assertEqual(len(data), 1)
         self.assertFalse(data[0]["extendedProps"]["confirmed"])
 
+    def test_confirmed_count_reflects_all_users_not_just_requesting_user(
+        self,
+    ):
+        event = Event.objects.create(
+            title="Café con vecinos", start_at=timezone.now()
+        )
+        other_resident = create_user("otro_residente")
+        Confirmation.objects.create(user=other_resident, event=event)
+        Confirmation.objects.create(
+            user=User.objects.get(username="residente"), event=event
+        )
+
+        response = self.client.get(reverse("calendario-eventos"))
+
+        data = response.json()
+        self.assertEqual(data[0]["extendedProps"]["confirmedCount"], 2)
+
 
 class EventCreateViewTests(TestCase):
     def test_requires_authentication(self):
@@ -192,6 +209,7 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(event.title, "Jornada de siembra")
         self.assertEqual(event.created_by, admin)
         self.assertEqual(response.json()["title"], "Jornada de siembra")
+        self.assertEqual(response.json()["extendedProps"]["confirmedCount"], 0)
 
     def test_staff_can_create_event_with_all_fields(self):
         create_user("admin", is_staff=True)
@@ -798,6 +816,18 @@ class EventConfirmViewTests(TestCase):
                 user=resident_a, event=self.event
             ).exists()
         )
+
+    def test_confirmed_count_includes_other_users_existing_confirmations(
+        self,
+    ):
+        other_resident = create_user("otro_residente")
+        Confirmation.objects.create(user=other_resident, event=self.event)
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.post(self.confirm_url())
+
+        self.assertEqual(response.json()["extendedProps"]["confirmedCount"], 2)
 
     def test_confirming_nonexistent_event_returns_404(self):
         create_user("residente")
