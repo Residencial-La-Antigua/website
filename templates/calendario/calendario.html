@@ -35,6 +35,12 @@
       <h2 id="event-modal-title"></h2>
       <p id="event-modal-schedule" class="event-modal-schedule"></p>
       <p id="event-modal-location" class="event-modal-location"></p>
+      <p id="event-modal-meeting-link" class="event-modal-meeting-link">
+        <span>Enlace de reunión virtual:</span>
+        <a id="event-modal-meeting-link-anchor" target="_blank" rel="noopener"
+          ></a
+        >
+      </p>
       <p id="event-modal-description" class="event-modal-description"></p>
       <div class="event-form-actions">
         <button type="submit" class="btn">Cerrar</button>
@@ -129,6 +135,16 @@
 
         <label for="event-form-location">Ubicación (opcional)</label>
         <input type="text" id="event-form-location" name="location" />
+
+        <label for="event-form-meeting-link">
+          Enlace de reunión virtual (opcional)
+        </label>
+        <input
+          type="url"
+          id="event-form-meeting-link"
+          name="meeting_link"
+          placeholder="https://zoom.us/j/..."
+        />
 
         <label for="event-form-description">Descripción (opcional)</label>
         <textarea id="event-form-description" name="description"></textarea>
