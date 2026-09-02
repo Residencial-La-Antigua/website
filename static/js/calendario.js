@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
     eventClick: function (info) {
       showEventDetail(info.event);
     },
+    eventDidMount: function (info) {
+      info.el.title = info.event.title;
+    },
     datesSet: function (info) {
       yearSelect.value = String(info.view.currentStart.getUTCFullYear());
     },
