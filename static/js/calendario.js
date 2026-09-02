@@ -99,6 +99,17 @@ document.addEventListener('DOMContentLoaded', function () {
       ? 'Ubicación: ' + eventLocation
       : '';
 
+    var meetingLink = event.extendedProps.meetingLink;
+    var meetingLinkEl = document.getElementById('event-modal-meeting-link');
+    meetingLinkEl.hidden = !meetingLink;
+    if (meetingLink) {
+      var meetingLinkAnchor = document.getElementById(
+        'event-modal-meeting-link-anchor',
+      );
+      meetingLinkAnchor.href = meetingLink;
+      meetingLinkAnchor.textContent = meetingLink;
+    }
+
     var description = event.extendedProps.description;
     document.getElementById('event-modal-description').textContent =
       description || 'Sin descripción.';
@@ -170,6 +181,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('event-form-title').value = event.title;
     document.getElementById('event-form-location').value =
       event.extendedProps.location || '';
+    document.getElementById('event-form-meeting-link').value =
+      event.extendedProps.meetingLink || '';
     document.getElementById('event-form-description').value =
       event.extendedProps.description || '';
     document.getElementById('event-form-start').value = toDatetimeLocalValue(

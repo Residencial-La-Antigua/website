@@ -29,6 +29,7 @@ def serialize_event(event, is_confirmed):
         "extendedProps": {
             "description": event.description,
             "location": event.location,
+            "meetingLink": event.meeting_link,
             "recurringGroup": str(event.recurring_group)
             if event.recurring_group
             else None,
@@ -159,6 +160,7 @@ class EventCreateView(StaffRequiredJSONMixin, View):
                 title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"],
                 location=form.cleaned_data["location"],
+                meeting_link=form.cleaned_data["meeting_link"],
                 start_at=occurrence_start,
                 end_at=occurrence_start + duration if duration else None,
                 recurring_group=group,

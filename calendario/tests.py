@@ -3,6 +3,7 @@ from datetime import UTC, date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,7 @@ from .recurrence import (
     TooManyOccurrences,
     generate_occurrence_starts,
 )
+from .validators import validate_meeting_link_domain
 
 User = get_user_model()
 
@@ -36,6 +38,27 @@ def create_user(username, is_active=True, is_staff=False):
         is_active=is_active,
         is_staff=is_staff,
     )
+
+
+class MeetingLinkValidatorTests(TestCase):
+    def test_accepts_exact_allowed_domain(self):
+        validate_meeting_link_domain("https://meet.google.com/abc-defg-hij")
+
+    def test_accepts_subdomain_of_allowed_domain(self):
+        validate_meeting_link_domain("https://us02web.zoom.us/j/123456789")
+
+    def test_rejects_disallowed_domain(self):
+        with self.assertRaises(ValidationError):
+            validate_meeting_link_domain("https://example.com/meeting")
+
+    def test_rejects_domain_ending_in_allowed_domain_without_dot_boundary(
+        self,
+    ):
+        # "evilzoom.us" ends with "zoom.us" as a plain string, but isn't a
+        # subdomain of it. The check must require a "." boundary, not just
+        # a string suffix match.
+        with self.assertRaises(ValidationError):
+            validate_meeting_link_domain("https://evilzoom.us/j/123")
 
 
 @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
@@ -204,6 +227,48 @@ class EventCreateViewTests(TestCase):
         errors = response.json()["errors"]
         self.assertIn("title", errors)
         self.assertIn("start_at", errors)
+
+    def test_staff_can_create_event_with_allowed_meeting_link(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Café virtual",
+                "start_at": "2026-08-20T09:00",
+                "meeting_link": "https://us02web.zoom.us/j/123456789",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = Event.objects.get()
+        self.assertEqual(
+            event.meeting_link, "https://us02web.zoom.us/j/123456789"
+        )
+        self.assertEqual(
+            response.json()["extendedProps"]["meetingLink"],
+            "https://us02web.zoom.us/j/123456789",
+        )
+
+    def test_disallowed_meeting_link_domain_returns_error_without_creating(
+        self,
+    ):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Café virtual",
+                "start_at": "2026-08-20T09:00",
+                "meeting_link": "https://example.com/meeting",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+        self.assertIn("meeting_link", response.json()["errors"])
 
     def test_recurring_weekly_with_count_creates_one_row_per_occurrence(self):
         create_user("admin", is_staff=True)
