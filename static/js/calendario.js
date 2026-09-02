@@ -114,6 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('event-modal-description').textContent =
       description || 'Sin descripción.';
 
+    document.getElementById('event-modal-confirmed-count-value').textContent =
+      String(event.extendedProps.confirmedCount || 0);
+
     modal.dataset.eventId = event.id;
 
     setConfirmButtonState(
@@ -310,13 +313,22 @@ document.addEventListener('DOMContentLoaded', function () {
       }).then(function (response) {
         if (response.ok) {
           setConfirmButtonState(confirmButton, !isConfirmed);
+
+          var countEl = document.getElementById(
+            'event-modal-confirmed-count-value',
+          );
+          var newCount =
+            Number(countEl.textContent || 0) + (isConfirmed ? -1 : 1);
+          countEl.textContent = String(newCount);
+
           // FullCalendar keeps its own cached copy of each event's
           // extendedProps, reused as-is (no refetch) when the same event
           // is clicked again. Without updating it here too, reopening
           // this event later in the same page session would read the
-          // stale pre-confirm value and reset the button incorrectly.
+          // stale pre-confirm/pre-count value and reset the UI incorrectly.
           if (currentEvent) {
             currentEvent.setExtendedProp('confirmed', !isConfirmed);
+            currentEvent.setExtendedProp('confirmedCount', newCount);
           }
         }
       });
