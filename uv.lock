@@ -246,6 +246,7 @@ dependencies = [
     { name = "markdown" },
     { name = "psycopg", extra = ["binary"] },
     { name = "python-frontmatter" },
+    { name = "tzdata" },
     { name = "whitenoise" },
 ]
 
@@ -262,6 +263,7 @@ requires-dist = [
     { name = "markdown", specifier = ">=3.10.3" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.4" },
     { name = "python-frontmatter", specifier = ">=1.3.0" },
+    { name = "tzdata", specifier = ">=2026.3" },
     { name = "whitenoise", specifier = ">=6.12.0" },
 ]
 

@@ -160,11 +160,23 @@ document.addEventListener('DOMContentLoaded', function () {
     return formattedStart + ' — ' + formattedEnd;
   }
 
+  // The backend's JSON API (see calendario/views.py's serialize_event)
+  // deliberately keeps sending event times as Costa Rica wall-clock
+  // numbers labeled UTC (`timeZone: 'UTC'`). `toRealUtc` ensures the
+  // database now stores genuine UTC. Google Calendar's own `dates` param
+  // only accepts true UTC and converts it to the viewer's real local time.
+  var RESIDENT_LOCAL_UTC_OFFSET_MS = 6 * 60 * 60 * 1000;
+
+  function toRealUtc(date) {
+    return new Date(date.getTime() + RESIDENT_LOCAL_UTC_OFFSET_MS);
+  }
+
   function buildGoogleCalendarUrl(event) {
-    var start = event.start;
-    // Default to a 1-hour event if no end time is provided
-    // (Google Calendar requires an end time).
-    var end = event.end || new Date(start.getTime() + 60 * 60 * 1000);
+    // Default to a 1-hour event if no end time is provided (Google
+    // Calendar requires an end time)
+    var rawEnd = event.end || new Date(event.start.getTime() + 60 * 60 * 1000);
+    var start = toRealUtc(event.start);
+    var end = toRealUtc(rawEnd);
 
     var location = event.extendedProps.location || '';
     var meetingLink = event.extendedProps.meetingLink;
