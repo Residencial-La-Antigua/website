@@ -1,5 +1,7 @@
 import uuid
 from datetime import UTC, date, datetime, timedelta
+from datetime import timezone as dt_timezone
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,7 +17,9 @@ from .recurrence import (
     TooManyOccurrences,
     generate_occurrence_starts,
 )
+from .timezones import to_local_wall_clock, to_true_utc
 from .validators import validate_meeting_link_domain
+from .views import EventListView
 
 User = get_user_model()
 
@@ -39,6 +43,42 @@ def create_user(username, is_active=True, is_staff=False):
         is_active=is_active,
         is_staff=is_staff,
     )
+
+
+class TimezonesTests(TestCase):
+    # A fixed offset (no DST) keeps the math unambiguous regardless 
+    # of the date used.
+    TEST_TZ = dt_timezone(timedelta(hours=3))
+
+    def test_to_true_utc_shifts_by_the_given_timezones_offset(self):
+        local = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
+        self.assertEqual(
+            to_true_utc(local, tz=self.TEST_TZ),
+            datetime(2026, 9, 25, 12, 0, tzinfo=UTC),
+        )
+
+    def test_to_true_utc_crosses_a_day_boundary(self):
+        local = datetime(2026, 9, 25, 1, 0, tzinfo=UTC)
+        self.assertEqual(
+            to_true_utc(local, tz=self.TEST_TZ),
+            datetime(2026, 9, 24, 22, 0, tzinfo=UTC),
+        )
+
+    def test_to_local_wall_clock_is_the_inverse_of_to_true_utc(self):
+        original = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
+        converted = to_true_utc(original, tz=self.TEST_TZ)
+        self.assertEqual(
+            to_local_wall_clock(converted, tz=self.TEST_TZ), original
+        )
+
+    def test_defaults_to_resident_tz_when_no_timezone_is_given(self):
+        # RESIDENT_TZ (Costa Rica, UTC-6) is the production default -
+        # this is the one test that pins that default, so a change to
+        # RESIDENT_TZ shows up here rather than silently everywhere.
+        local = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
+        self.assertEqual(
+            to_true_utc(local), datetime(2026, 9, 25, 21, 0, tzinfo=UTC)
+        )
 
 
 class MeetingLinkValidatorTests(TestCase):
@@ -143,6 +183,21 @@ class EventListViewTests(TestCase):
         self.assertIn("Este mes", titles)
         self.assertNotIn("Otro mes", titles)
 
+    def test_current_month_range_uses_costa_rica_local_date_not_utc_date(
+        self,
+    ):
+        # 2026-03-01T02:00:00Z is already March 1 in UTC, but still Feb
+        # 28 evening in Costa Rica (UTC-6). The "no params" fallback
+        # must resolve "today" using the resident-relevant local date,
+        # or it picks the wrong month for the first ~6 hours of every
+        # UTC day.
+        frozen_now = datetime(2026, 3, 1, 2, 0, tzinfo=UTC)
+        with patch("calendario.views.timezone.now", return_value=frozen_now):
+            start, end = EventListView._current_month_range()
+
+        self.assertEqual(start, datetime(2026, 2, 1, 6, 0, tzinfo=UTC))
+        self.assertEqual(end, datetime(2026, 3, 1, 6, 0, tzinfo=UTC))
+
     def test_confirmed_flag_is_specific_to_the_requesting_user(self):
         event = Event.objects.create(
             title="Café con vecinos", start_at=timezone.now()
@@ -211,6 +266,26 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(event.created_by, admin)
         self.assertEqual(response.json()["title"], "Jornada de siembra")
         self.assertEqual(response.json()["extendedProps"]["confirmedCount"], 0)
+
+    def test_local_time_round_trips_through_storage_and_serialization(self):
+        # A resident types "15:00" meaning 15:00 local time (per RESIDENT_TZ). 
+        # The database must store the true UTC equivalent, not 15:00 UTC. 
+        # The API response must echo back the original "15:00" the resident typed,
+        # since the frontend displays whatever it's given as-is.
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Café con vecinos", "start_at": "2026-09-25T15:00"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = Event.objects.get()
+        self.assertEqual(
+            event.start_at, datetime(2026, 9, 25, 21, 0, tzinfo=UTC)
+        )
+        self.assertEqual(response.json()["start"], "2026-09-25T15:00:00+00:00")
 
     def test_staff_can_create_event_with_all_fields(self):
         create_user("admin", is_staff=True)
@@ -307,9 +382,11 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Event.objects.count(), 3)
         events = list(Event.objects.order_by("start_at"))
+        # 18:00 Costa Rica (UTC-6) (per RESIDENT_TZ) is stored as 
+        # 00:00 UTC the *next* calendar day.
         self.assertEqual(
             [e.start_at.date().isoformat() for e in events],
-            ["2026-08-03", "2026-08-10", "2026-08-17"],
+            ["2026-08-04", "2026-08-11", "2026-08-18"],
         )
         self.assertEqual(len({e.recurring_group for e in events}), 1)
         self.assertIsNotNone(events[0].recurring_group)
@@ -334,10 +411,12 @@ class EventCreateViewTests(TestCase):
         events = list(Event.objects.order_by("start_at"))
         # Jan 31 + 1 month clamps to Feb 28 (2026 is not a leap year), then
         # Mar 31, then Apr 30 (April only has 30 days), then May 31 would
-        # exceed the May 1 end_date so it stops.
+        # exceed the May 1 end_date so it stops. Each is at 18:00 Costa
+        # Rica (UTC-6) (per RESIDENT_TZ), stored as 00:00 UTC the *next* 
+        # calendar day.
         self.assertEqual(
             [e.start_at.date().isoformat() for e in events],
-            ["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"],
+            ["2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01"],
         )
 
     def test_recurring_preserves_duration_across_occurrences(self):
@@ -955,3 +1034,25 @@ class EventIcsViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_exported_time_matches_the_local_time_a_staff_member_typed(
+        self,
+    ):
+        # End-to-end regression test for the originally reported bug: a
+        # staff member creates an event meaning 15:00 Costa Rica local
+        # time, and the downloaded .ics must encode the true UTC
+        # equivalent (21:00Z), not the raw "15:00Z" Google Calendar/
+        # Outlook would otherwise mis-display 6 hours early.
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+        self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Café virtual", "start_at": "2026-09-25T15:00"},
+        )
+        event = Event.objects.get(title="Café virtual")
+
+        response = self.client.get(
+            reverse("calendario-eventos-ics", args=[event.pk])
+        )
+
+        self.assertIn(b"DTSTART:20260925T210000Z", response.content)

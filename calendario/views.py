@@ -19,14 +19,17 @@ from .recurrence import (
     TooManyOccurrences,
     generate_occurrence_starts,
 )
+from .timezones import to_local_wall_clock, to_true_utc
 
 
 def serialize_event(event, is_confirmed, confirmed_count):
+    start = to_local_wall_clock(event.start_at)
+    end = to_local_wall_clock(event.end_at) if event.end_at else None
     return {
         "id": event.id,
         "title": event.title,
-        "start": event.start_at.isoformat(),
-        "end": event.end_at.isoformat() if event.end_at else None,
+        "start": start.isoformat(),
+        "end": end.isoformat() if end else None,
         "extendedProps": {
             "description": event.description,
             "location": event.location,
@@ -88,24 +91,28 @@ class EventListView(LoginRequiredJSONMixin, View):
             return None
         if timezone.is_naive(dt):
             dt = timezone.make_aware(dt, datetime.UTC)
-        return dt
+        return to_true_utc(dt)
 
     @staticmethod
     def _current_month_range():
-        today = timezone.now().date()
+        today = to_local_wall_clock(timezone.now()).date()
         month_start = today.replace(day=1)
         if month_start.month == 12:
             month_end = month_start.replace(year=month_start.year + 1, month=1)
         else:
             month_end = month_start.replace(month=month_start.month + 1)
         return (
-            timezone.make_aware(
-                datetime.datetime.combine(month_start, datetime.time.min),
-                datetime.UTC,
+            to_true_utc(
+                timezone.make_aware(
+                    datetime.datetime.combine(month_start, datetime.time.min),
+                    datetime.UTC,
+                )
             ),
-            timezone.make_aware(
-                datetime.datetime.combine(month_end, datetime.time.min),
-                datetime.UTC,
+            to_true_utc(
+                timezone.make_aware(
+                    datetime.datetime.combine(month_end, datetime.time.min),
+                    datetime.UTC,
+                )
             ),
         )
 
@@ -122,6 +129,9 @@ class EventCreateView(StaffRequiredJSONMixin, View):
 
         if not recurrence_form.cleaned_data["is_recurring"]:
             event = form.save(commit=False)
+            event.start_at = to_true_utc(event.start_at)
+            if event.end_at:
+                event.end_at = to_true_utc(event.end_at)
             event.created_by = request.user
             event.save()
             return JsonResponse(serialize_event(event, False, 0), status=201)
@@ -167,8 +177,10 @@ class EventCreateView(StaffRequiredJSONMixin, View):
                 description=form.cleaned_data["description"],
                 location=form.cleaned_data["location"],
                 meeting_link=form.cleaned_data["meeting_link"],
-                start_at=occurrence_start,
-                end_at=occurrence_start + duration if duration else None,
+                start_at=to_true_utc(occurrence_start),
+                end_at=to_true_utc(occurrence_start + duration)
+                if duration
+                else None,
                 recurring_group=group,
                 created_by=request.user,
             )
@@ -192,7 +204,10 @@ class EventUpdateView(StaffRequiredJSONMixin, View):
                 {"errors": form.errors.get_json_data()}, status=400
             )
 
-        form.save()
+        event = form.save(commit=False)
+        event.start_at = to_true_utc(event.start_at)
+        event.end_at = to_true_utc(event.end_at) if event.end_at else None
+        event.save()
         is_confirmed = event.confirmations.filter(user=request.user).exists()
         return JsonResponse(
             serialize_event(event, is_confirmed, event.confirmations.count())
