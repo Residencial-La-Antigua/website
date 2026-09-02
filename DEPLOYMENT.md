@@ -13,6 +13,12 @@ ALLOWED_HOSTS="ejemplo.com,www.ejemplo.com"
 DATABASE_URL="postgres://usuario:contraseña@host:5432/nombre_db"
 ```
 
+## Zona horaria del calendario
+
+`config/settings.py` usa `TIME_ZONE = "UTC"` para toda la aplicación, pero la comunidad de residentes vive físicamente en una sola zona horaria real. `RESIDENT_TZ` en [calendario/timezones.py](calendario/timezones.py) es esa zona horaria: se usa para convertir la hora que un residente escribe en el formulario del calendario a UTC antes de guardarla, y de vuelta a la hora local al mostrarla en el calendario.
+
+De momento, es intencional mantener este valor específico al módulo `calendario` en vez de una configuración global. Si este proyecto se adapta para una comunidad en otra zona horaria, hay que actualizar `RESIDENT_TZ` y `RESIDENT_LOCAL_UTC_OFFSET_MS` (`static/js/calendario.js`) respectivamente.
+
 ## Base de datos
 
 El ambiente de desarrollo (`dev`) usa SQLite por defecto, sin servicios adicionales, sin configuración. El ambiente de producción usa Postgres, configurado vía `DATABASE_URL` (parseado con [dj-database-url](https://pypi.org/project/dj-database-url/); el driver es [psycopg](https://www.psycopg.org/psycopg3/)). Esta decisión es intencional: dado el tamaño actual del proyecto (CRUD simple sobre el ORM de Django, sin funcionalidades específicas de Postgres), el riesgo de divergencia entre dev y producción es bajo, así que mantener SQLite en `dev` evita añadir un servicio extra al flujo de desarrollo local. Si el proyecto crece en complejidad, vale la pena revisar esta decisión.
