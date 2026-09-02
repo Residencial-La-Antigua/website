@@ -8,6 +8,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
+from .ics import build_event_ics
 from .models import Confirmation, Event
 from .recurrence import (
     MAX_OCCURRENCES,
@@ -835,6 +836,122 @@ class EventConfirmViewTests(TestCase):
 
         response = self.client.post(
             reverse("calendario-eventos-confirmar", args=[self.event.pk + 999])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+class BuildEventIcsTests(TestCase):
+    def test_includes_core_fields(self):
+        event = Event.objects.create(
+            title="Café con vecinos",
+            description="Traer sillas",
+            location="Casa comunal",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+            end_at=datetime(2026, 9, 20, 16, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("BEGIN:VCALENDAR", ics)
+        self.assertIn("BEGIN:VEVENT", ics)
+        self.assertIn(f"UID:event-{event.pk}@arbolesdelaantigua.org", ics)
+        self.assertIn("DTSTART:20260920T150000Z", ics)
+        self.assertIn("DTEND:20260920T160000Z", ics)
+        self.assertIn("SUMMARY:Café con vecinos", ics)
+        self.assertIn("DESCRIPTION:Traer sillas", ics)
+        self.assertIn("LOCATION:Casa comunal", ics)
+
+    def test_missing_end_at_defaults_to_one_hour_duration(self):
+        event = Event.objects.create(
+            title="Café con vecinos",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("DTSTART:20260920T150000Z", ics)
+        self.assertIn("DTEND:20260920T160000Z", ics)
+
+    def test_meeting_link_is_appended_to_location(self):
+        event = Event.objects.create(
+            title="Reunión virtual",
+            location="Casa comunal",
+            meeting_link="https://us02web.zoom.us/j/123456789",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn(
+            "LOCATION:Casa comunal (https://us02web.zoom.us/j/123456789)",
+            ics,
+        )
+
+    def test_meeting_link_alone_is_used_as_location_when_no_location_set(
+        self,
+    ):
+        event = Event.objects.create(
+            title="Reunión virtual",
+            meeting_link="https://us02web.zoom.us/j/123456789",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn(
+            "LOCATION:https://us02web.zoom.us/j/123456789",
+            ics,
+        )
+
+    def test_escapes_special_characters_in_text_fields(self):
+        event = Event.objects.create(
+            title="Reunión; anual, café\\pan",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("SUMMARY:Reunión\\; anual\\, café\\\\pan", ics)
+
+
+@override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
+class EventIcsViewTests(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Café con vecinos",
+            start_at=datetime(2026, 8, 20, 18, 0, tzinfo=UTC),
+        )
+
+    def ics_url(self):
+        return reverse("calendario-eventos-ics", args=[self.event.pk])
+
+    def test_requires_authentication(self):
+        response = self.client.get(self.ics_url())
+        self.assertRedirects(
+            response,
+            f"{reverse('login')}?next={self.ics_url()}",
+        )
+
+    def test_resident_can_download(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.get(self.ics_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"], "text/calendar; charset=utf-8"
+        )
+        self.assertIn("attachment", response["Content-Disposition"])
+        self.assertIn(b"SUMMARY:Caf\xc3\xa9 con vecinos", response.content)
+
+    def test_downloading_nonexistent_event_returns_404(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.get(
+            reverse("calendario-eventos-ics", args=[self.event.pk + 999])
         )
 
         self.assertEqual(response.status_code, 404)

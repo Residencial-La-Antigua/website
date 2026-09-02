@@ -11,6 +11,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from .forms import EventForm, RecurrenceForm
+from .ics import build_event_ics
 from .mixins import LoginRequiredJSONMixin, StaffRequiredJSONMixin
 from .models import Confirmation, Event
 from .recurrence import (
@@ -239,3 +240,19 @@ class EventConfirmView(LoginRequiredJSONMixin, View):
         event = get_object_or_404(Event, pk=pk)
         Confirmation.objects.filter(user=request.user, event=event).delete()
         return HttpResponse(status=204)
+
+
+class EventIcsView(LoginRequiredMixin, View):
+    """Downloads a single event (or, for a recurring series, this one
+    occurrence) as an .ics file, for import into Outlook or other
+    calendar apps."""
+
+    def get(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        response = HttpResponse(
+            build_event_ics(event), content_type="text/calendar; charset=utf-8"
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="evento-{event.pk}.ics"'
+        )
+        return response
