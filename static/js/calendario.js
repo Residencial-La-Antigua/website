@@ -117,6 +117,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('event-modal-confirmed-count-value').textContent =
       String(event.extendedProps.confirmedCount || 0);
 
+    document.getElementById('event-modal-google-calendar-link').href =
+      buildGoogleCalendarUrl(event);
+    document.getElementById('event-modal-ics-link').href =
+      eventsUrl + event.id + '/ics/';
+
     modal.dataset.eventId = event.id;
 
     setConfirmButtonState(
@@ -153,6 +158,33 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!end) return formattedStart;
     var formattedEnd = new Intl.DateTimeFormat('es', options).format(end);
     return formattedStart + ' — ' + formattedEnd;
+  }
+
+  function buildGoogleCalendarUrl(event) {
+    var start = event.start;
+    // Default to a 1-hour event if no end time is provided
+    // (Google Calendar requires an end time).
+    var end = event.end || new Date(start.getTime() + 60 * 60 * 1000);
+
+    var location = event.extendedProps.location || '';
+    var meetingLink = event.extendedProps.meetingLink;
+    if (meetingLink) {
+      location = location ? location + ' (' + meetingLink + ')' : meetingLink;
+    }
+
+    var params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: event.title,
+      dates:
+        formatGoogleCalendarDate(start) + '/' + formatGoogleCalendarDate(end),
+      details: event.extendedProps.description || '',
+      location: location,
+    });
+    return 'https://calendar.google.com/calendar/render?' + params.toString();
+  }
+
+  function formatGoogleCalendarDate(date) {
+    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
   }
 
   function getCsrfToken() {
