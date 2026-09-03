@@ -2,15 +2,16 @@
 
 ## Configurar variables de entorno
 
-[config/settings.py](config/settings.py) lee `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` y `DATABASE_URL` de variables de entorno. Ninguna es necesaria para desarrollo local; todas tienen valores por defecto seguros: `SECRET_KEY` cae a una llave insegura de desarrollo, `DEBUG` a `True`, `ALLOWED_HOSTS` a vacío (Django permite `localhost`/`127.0.0.1` automáticamente cuando `DEBUG=True`) y `DATABASE_URL` a una instancia de SQLite local.
+[config/settings.py](config/settings.py) lee `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL` y `ANALYTICS_SALT` de variables de entorno. Ninguna es necesaria para desarrollo local. `SECRET_KEY` y `ANALYTICS_SALT` tienen valores predefinidos e inseguros de desarrollo, `DEBUG` es igual a `True`, `ALLOWED_HOSTS` a vacío (Django permite `localhost`/`127.0.0.1` automáticamente cuando `DEBUG=True`) y `DATABASE_URL` a una instancia de SQLite local.
 
-Por lo tanto, en producción hay que asignar valores a `SECRET_KEY`, `ALLOWED_HOSTS` y `DATABASE_URL`. En caso contrario, `docker compose` se niega a arrancar con un mensaje claro, en vez de fallar a medias dentro del contenedor.
+Por lo tanto, en producción hay que asignar valores a `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL` y `ANALYTICS_SALT`. En caso contrario, `docker compose` se niega a arrancar.
 
 ```bash
 SECRET_KEY="<clave larga y aleatoria>"
 DEBUG="False"
 ALLOWED_HOSTS="ejemplo.com,www.ejemplo.com"
 DATABASE_URL="postgres://usuario:contraseña@host:5432/nombre_db"
+ANALYTICS_SALT="<clave larga y aleatoria, distinta de SECRET_KEY>"
 ```
 
 ## Zona horaria del calendario
@@ -39,6 +40,7 @@ Con `DEBUG=False`, Django deja de servir archivos estáticos automáticamente. E
 SECRET_KEY="<clave larga y aleatoria>" \
 ALLOWED_HOSTS="ejemplo.com,www.ejemplo.com" \
 DATABASE_URL="postgres://usuario:contraseña@host:5432/nombre_db" \
+ANALYTICS_SALT="<clave larga y aleatoria, distinta de SECRET_KEY>" \
 docker compose -f docker-compose.prod.yml up --build
 ```
 
@@ -70,4 +72,4 @@ Render construye la imagen directamente desde el [Dockerfile](Dockerfile) i.e. n
 
 - **Language**: Docker
 - **Docker Command** (en Advanced): `sh scripts/start-prod.sh`
-- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, `ALLOWED_HOSTS` — esta última hay que agregarla _después_ de crear el servicio (en caso de utilizar una solución de hosting como Render pues se debe saber cuál es el dominio). Sin `ALLOWED_HOSTS` todas las peticiones se rechazan con `DisallowedHost`.
+- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, `ANALYTICS_SALT`, `ALLOWED_HOSTS` — esta última hay que agregarla _después_ de crear el servicio (en caso de utilizar una solución de hosting como Render pues se debe saber cuál es el dominio). Sin `ALLOWED_HOSTS` todas las peticiones se rechazan con `DisallowedHost`.

@@ -1,0 +1,15 @@
+<script
+  defer
+  src="https://cloud.umami.is/script.js"
+  data-website-id="aa5fcd3e-cc6b-4415-9c2b-f25b8d44635f"
+></script>
+{% load analytics %}
+{% if user.is_authenticated %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.umami) {
+        umami.identify('{{ user|analytics_id }}');
+      }
+    });
+  </script>
+{% endif %}

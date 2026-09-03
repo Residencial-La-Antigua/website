@@ -47,6 +47,15 @@ docker compose exec web uv run manage.py createsuperuser
 - **HTML/CSS/JS:** [Prettier](https://prettier.io/). El repo trae `.prettierrc` con la configuración compartida; basta con tener la extensión de Prettier del editor activada (o correr `npx prettier --write .` si prefieres la CLI). Por ahora esto no está forzado automáticamente (sin pre-commit hook ni CI) — depende de que cada quien lo corra o tenga formato-al-guardar activado.
   - **Los templates de Django (`templates/**/_.html`, `accounts/templates/\*\*/_.html`) están excluidos vía `.prettierignore`.** El parser HTML de Prettier no entiende las etiquetas `{% %}` de Django y puede partirlas en dos líneas cuando son largas y eso rompe el parser de templates de Django. Si en algún momento se quiere formatear estos archivos, hace falta un plugin de Prettier que entienda templates de Django/Jinja, no el parser HTML plano.
 
+## Analítica
+
+Todo el sitio ha instrumentado utilizando [Umami](https://umami.is/) — `templates/base.html` incluye `templates/_umami.html`, o sea que aplica a cualquier página que extienda `base.html`. Umami no usa cookies ni recolecta datos de usuarios visitantes. En el caso de usuarios registrados, Umami lleva control de las sesiones mediante un ID derivado con hash, de manera que ningún usuario pueda ser identificado personalmente. Esto con el propósito de entender las interacciones con la funcionalidad del portal.
+
+Para no contaminar las estadísticas durante el desarrollo o pruebas locales, hay dos opciones:
+
+- Comentar temporalmente el `{% include "_umami.html" %}` en `templates/base.html`.
+- Excluir el propio navegador manualmente según la documentación de Umami: https://docs.umami.is/docs/exclude-my-own-visits
+
 ## Tecnología (Tech Stack)
 
 - **Backend:** Django
