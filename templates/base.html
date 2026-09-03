@@ -13,7 +13,7 @@
     />
     <link rel="stylesheet" href="{% static 'css/reset.css' %}" />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/migration.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/migration.css' %}?v=10" />
     {% block extra_css %}{% endblock %}
   </head>
   <body class="{% block body_class %}{% endblock %}">
@@ -22,6 +22,19 @@
         <img src="{% static 'images/migration/general/logoADLA.JPG' %}" alt="" />
         <span>Árboles de<br />la Antigua</span>
       </a>
+
+      <button
+        type="button"
+        class="mig-menu-toggle"
+        data-mig-menu-toggle
+        aria-controls="mig-navigation"
+        aria-expanded="false"
+        aria-label="Abrir menú"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
       <div class="mig-menu" id="mig-navigation" data-mig-menu>
         <nav class="mig-primary-nav" aria-label="Navegación principal">
@@ -75,20 +88,34 @@
             <span class="mig-whatsapp-label">Acompáñanos</span>
           </button>
         </div>
-        <button
-          type="button"
-          class="mig-menu-toggle"
-          data-mig-menu-toggle
-          aria-controls="mig-navigation"
-          aria-expanded="false"
-          aria-label="Abrir menú"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </div>
     </header>
+
+    {% block page_hero %}
+    <section class="mig-page-hero-shell" aria-label="Bloque hero">
+      <div class="mig-page-hero">
+        <div class="mig-page-hero-logo-group" aria-hidden="true">
+          <div class="mig-page-hero-logo">
+            <img
+              src="{% static 'images/migration/general/logoADLA.JPG' %}"
+              alt=""
+            />
+          </div>
+        </div>
+        <h2>
+          Cuidamos los<br />
+          <span>árboles</span><br />
+          que nos cuidan.
+        </h2>
+        <div class="mig-page-hero-tools">
+          <p>
+            Somos una organización comunitaria dedicada a la preservación,
+            siembra y mantenimiento del patrimonio arbóreo.
+          </p>
+        </div>
+      </div>
+    </section>
+    {% endblock %}
 
     <main class="{% block main_class %}container{% endblock %}">
       {% if messages %}
@@ -153,7 +180,7 @@
         </a>
       </p>
     </template>
-    <script src="{% static 'js/migration.js' %}" defer></script>
+    <script src="{% static 'js/migration.js' %}?v=2" defer></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

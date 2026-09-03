@@ -17,11 +17,13 @@ _STORAGES_WITHOUT_MANIFEST = {
 
 @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
 class MigrationPageTests(TestCase):
-    def test_root_keeps_existing_home_template(self):
+    def test_root_uses_migrated_home_template(self):
         response = self.client.get(reverse("home"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "home.html")
+        self.assertTemplateUsed(response, "homemig.html")
+        self.assertContains(response, "Cuidamos los")
+        self.assertNotContains(response, 'class="mig-page-hero"')
 
     def test_noticias_placeholder_has_named_route(self):
         response = self.client.get(reverse("noticias"))
@@ -29,6 +31,9 @@ class MigrationPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "noticias.html")
         self.assertContains(response, "Estamos preparando este espacio")
+        self.assertContains(response, 'class="mig-page-hero"')
+        self.assertContains(response, "images/migration/general/logoADLA.JPG")
+        self.assertContains(response, "Cuidamos los")
 
     def test_migrated_home_renders_without_public_route(self):
         request = RequestFactory().get("/")
@@ -39,6 +44,7 @@ class MigrationPageTests(TestCase):
         self.assertIn("Cuidamos los", content)
         self.assertIn("images/migration/general/Hero.jpg", content)
         self.assertIn("mig-report-dialog", content)
+        self.assertIn("Fundada en 2024", content)
         self.assertNotIn("translations.js", content)
         self.assertNotIn("lang-dropdown", content)
 

@@ -62,10 +62,13 @@
 }
 
 .mig-brand img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border-radius: 50%;
+  display: block;
+  width: auto;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 9px;
+  filter: saturate(0.92) contrast(0.94) brightness(1.03);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
 }
 
 .mig-primary-nav,
@@ -171,6 +174,7 @@
   width: 21px;
   height: 21px;
   object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .mig-menu-toggle {
@@ -210,6 +214,83 @@
 .mig-greeting {
   color: var(--color-text-muted);
   font-size: 0.9rem;
+}
+
+.mig-page-hero-shell {
+  width: min(1100px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.mig-page-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.7rem;
+  padding: 0.75rem 0.95rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  background:
+    linear-gradient(90deg, rgba(22, 35, 26, 0.4), rgba(22, 35, 26, 0.22)),
+    url('../images/migration/general/Hero.jpg') center / cover no-repeat;
+  box-shadow: 0 8px 24px rgba(45, 106, 79, 0.12);
+}
+
+[data-theme='dark'] .mig-page-hero {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+}
+
+.mig-page-hero-logo-group {
+  position: absolute;
+  top: 50%;
+  right: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  transform: translateY(-50%);
+}
+
+.mig-page-hero-logo {
+  display: grid;
+  place-content: center;
+  width: 62px;
+  height: 62px;
+  overflow: visible;
+  border-radius: 14px;
+}
+
+.mig-page-hero-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+.mig-page-hero h2 {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 100%;
+  margin: 0;
+  color: #ddeae2;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.35rem, 3.1vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 252, 245, 0.62);
+}
+
+.mig-page-hero h2 span {
+  color: #74c99a;
+  font-style: italic;
+}
+
+.mig-page-hero-tools {
+  display: none;
 }
 
 .mig-dialog-overlay {
@@ -473,9 +554,16 @@ body.mig-dialog-open {
   gap: clamp(2rem, 6vw, 5rem);
 }
 
+.migration-home .mig-about-layout > * {
+  min-width: 0;
+}
+
 .migration-home .mig-mosaic {
-  columns: 3 130px;
+  column-count: 3;
   column-gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .migration-home .mig-photo-button {
@@ -493,25 +581,54 @@ body.mig-dialog-open {
 .migration-home .mig-photo-button img {
   display: block;
   width: 100%;
-  min-height: 110px;
-  object-fit: cover;
+  height: auto;
   transition: transform 240ms ease;
-}
-
-.migration-home .mig-photo-button:nth-child(3n + 1) img {
-  aspect-ratio: 4 / 5;
-}
-
-.migration-home .mig-photo-button:nth-child(3n + 2) img {
-  aspect-ratio: 1;
-}
-
-.migration-home .mig-photo-button:nth-child(3n) img {
-  aspect-ratio: 5 / 4;
 }
 
 .migration-home .mig-photo-button:hover img {
   transform: scale(1.035);
+}
+
+.migration-home .mig-mosaic-spacer {
+  display: inline-block;
+  width: 100%;
+  height: 54px;
+  margin: 0 0 8px;
+  break-inside: avoid;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.migration-home .mig-founded-tile {
+  display: inline-flex;
+  width: 100%;
+  min-height: 96px;
+  margin: 0 0 8px;
+  break-inside: avoid;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  background: var(--mig-moss);
+  color: #fff;
+  box-shadow: var(--mig-shadow);
+  text-align: center;
+}
+
+.migration-home .mig-founded-tile strong {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.migration-home .mig-founded-tile span {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
 }
 
 .migration-home .mig-about-title {
@@ -579,22 +696,69 @@ body.mig-dialog-open {
   }
 }
 
+@media (max-width: 920px) {
+  .mig-page-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .mig-page-hero-logo-group {
+    position: static;
+    justify-content: center;
+    transform: none;
+  }
+
+  .mig-page-hero h2 {
+    grid-column: auto;
+  }
+}
+
 @media (max-width: 560px) {
   .migration-home .mig-stats-grid,
   .migration-home .mig-benefits {
     grid-template-columns: 1fr;
   }
 
-  .migration-home .mig-mosaic {
-    columns: 2 110px;
+  .migration-home .mig-mosaic-spacer {
+    display: none;
   }
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1600px) {
   .mig-menu-toggle {
     display: block;
   }
 
+  .mig-primary-nav {
+    position: absolute;
+    top: calc(100% + 1px);
+    right: clamp(1rem, 3vw, 2.5rem);
+    display: none;
+    width: min(360px, calc(100vw - 2rem));
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-surface);
+    box-shadow: var(--mig-shadow);
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .mig-menu.is-open .mig-primary-nav {
+    display: flex;
+  }
+
+  .mig-account-nav {
+    margin-left: auto;
+  }
+
+  .mig-controls {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 800px) {
   .mig-menu {
     position: absolute;
     top: calc(100% + 1px);
@@ -612,16 +776,29 @@ body.mig-dialog-open {
     display: grid;
   }
 
-  .mig-primary-nav,
-  .mig-account-nav {
+  .mig-primary-nav {
+    position: static;
+    width: auto;
     align-items: stretch;
     flex-direction: column;
     gap: 0.15rem;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .mig-account-nav {
+    margin-left: 0;
+    width: auto;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.15rem;
     padding-top: 0.65rem;
     border-top: 1px solid var(--color-border);
+  }
+
+  .mig-controls {
+    margin-left: auto;
   }
 }
 
@@ -632,6 +809,10 @@ body.mig-dialog-open {
 
   .mig-controls {
     margin-left: auto;
+  }
+
+  .mig-brand img {
+    height: 50px;
   }
 
   .mig-menu {

@@ -23,7 +23,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("calendario/", include("calendario.urls")),
-    path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path("", TemplateView.as_view(template_name="homemig.html"), name="home"),
     path(
         "noticias/",
         TemplateView.as_view(template_name="noticias.html"),
