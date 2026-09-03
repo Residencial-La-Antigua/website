@@ -9,4 +9,5 @@ services:
       - DEBUG=False
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:?ALLOWED_HOSTS debe estar definida}
       - DATABASE_URL=${DATABASE_URL:?DATABASE_URL debe estar definida}
+      - ANALYTICS_SALT=${ANALYTICS_SALT:?ANALYTICS_SALT debe estar definida}
       - PORT=${PORT:-8000}
