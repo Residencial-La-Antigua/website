@@ -170,10 +170,24 @@ class EventListViewTests(TestCase):
     def test_no_params_uses_current_month(self):
         now = timezone.now()
         Event.objects.create(title="Este mes", start_at=now)
-        if now.month == 12:
-            other_month = now.replace(year=now.year + 1, month=1, day=1)
+
+        # Day 15 sits obviously, unambiguously in the middle of 
+        # "next month" so it clearly should not be included in 
+        # the "current month" results.
+        local_today = to_local_wall_clock(now).date()
+        if local_today.month == 12:
+            other_month_date = local_today.replace(
+                year=local_today.year + 1, month=1, day=15
+            )
         else:
-            other_month = now.replace(month=now.month + 1, day=1)
+            other_month_date = local_today.replace(
+                month=local_today.month + 1, day=15
+            )
+        other_month = to_true_utc(
+            datetime.combine(other_month_date, datetime.min.time()).replace(
+                hour=12, tzinfo=UTC
+            )
+        )
         Event.objects.create(title="Otro mes", start_at=other_month)
 
         response = self.client.get(reverse("calendario-eventos"))
@@ -182,6 +196,34 @@ class EventListViewTests(TestCase):
         titles = [event["title"] for event in response.json()]
         self.assertIn("Este mes", titles)
         self.assertNotIn("Otro mes", titles)
+
+    def test_event_exactly_at_next_month_start_is_excluded(self):
+        # The "current month" upper bound is exclusive (start_at__lt=end):
+        # an event sitting exactly on next month's first local midnight
+        # belongs to next month, not this one, and must not show up.
+        now = timezone.now()
+        local_today = to_local_wall_clock(now).date()
+        if local_today.month == 12:
+            next_month_start_date = local_today.replace(
+                year=local_today.year + 1, month=1, day=1
+            )
+        else:
+            next_month_start_date = local_today.replace(
+                month=local_today.month + 1, day=1
+            )
+        next_month_start = to_true_utc(
+            datetime.combine(
+                next_month_start_date, datetime.min.time()
+            ).replace(tzinfo=UTC)
+        )
+        Event.objects.create(
+            title="Inicio del siguiente mes", start_at=next_month_start
+        )
+
+        response = self.client.get(reverse("calendario-eventos"))
+
+        titles = [event["title"] for event in response.json()]
+        self.assertNotIn("Inicio del siguiente mes", titles)
 
     def test_current_month_range_uses_costa_rica_local_date_not_utc_date(
         self,
