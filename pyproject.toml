@@ -9,6 +9,7 @@ dependencies = [
     "django>=6.0.7",
     "gunicorn>=26.0.0",
     "psycopg[binary]>=3.3.4",
+    "tzdata>=2026.3",
     "whitenoise>=6.12.0",
 ]
 

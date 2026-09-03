@@ -177,6 +177,7 @@ dependencies = [
     { name = "django" },
     { name = "gunicorn" },
     { name = "psycopg", extra = ["binary"] },
+    { name = "tzdata" },
     { name = "whitenoise" },
 ]
 
@@ -191,6 +192,7 @@ requires-dist = [
     { name = "django", specifier = ">=6.0.7" },
     { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.4" },
+    { name = "tzdata", specifier = ">=2026.3" },
     { name = "whitenoise", specifier = ">=6.12.0" },
 ]
 

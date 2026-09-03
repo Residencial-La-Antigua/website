@@ -2,7 +2,7 @@ import datetime
 import uuid
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -11,6 +11,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from .forms import EventForm, RecurrenceForm
+from .ics import build_event_ics
 from .mixins import LoginRequiredJSONMixin, StaffRequiredJSONMixin
 from .models import Confirmation, Event
 from .recurrence import (
@@ -18,21 +19,26 @@ from .recurrence import (
     TooManyOccurrences,
     generate_occurrence_starts,
 )
+from .timezones import to_local_wall_clock, to_true_utc
 
 
-def serialize_event(event, is_confirmed):
+def serialize_event(event, is_confirmed, confirmed_count):
+    start = to_local_wall_clock(event.start_at)
+    end = to_local_wall_clock(event.end_at) if event.end_at else None
     return {
         "id": event.id,
         "title": event.title,
-        "start": event.start_at.isoformat(),
-        "end": event.end_at.isoformat() if event.end_at else None,
+        "start": start.isoformat(),
+        "end": end.isoformat() if end else None,
         "extendedProps": {
             "description": event.description,
             "location": event.location,
+            "meetingLink": event.meeting_link,
             "recurringGroup": str(event.recurring_group)
             if event.recurring_group
             else None,
             "confirmed": is_confirmed,
+            "confirmedCount": confirmed_count,
         },
     }
 
@@ -53,10 +59,12 @@ class EventListView(LoginRequiredJSONMixin, View):
             start, end = self._current_month_range()
 
         events = list(
-            Event.objects.filter(start_at__lt=end).filter(
+            Event.objects.filter(start_at__lt=end)
+            .filter(
                 Q(end_at__gt=start)
                 | Q(end_at__isnull=True, start_at__gte=start)
             )
+            .annotate(confirmed_count=Count("confirmations"))
         )
         confirmed_ids = set(
             Confirmation.objects.filter(
@@ -66,7 +74,9 @@ class EventListView(LoginRequiredJSONMixin, View):
 
         return JsonResponse(
             [
-                serialize_event(event, event.id in confirmed_ids)
+                serialize_event(
+                    event, event.id in confirmed_ids, event.confirmed_count
+                )
                 for event in events
             ],
             safe=False,
@@ -81,24 +91,28 @@ class EventListView(LoginRequiredJSONMixin, View):
             return None
         if timezone.is_naive(dt):
             dt = timezone.make_aware(dt, datetime.UTC)
-        return dt
+        return to_true_utc(dt)
 
     @staticmethod
     def _current_month_range():
-        today = timezone.now().date()
+        today = to_local_wall_clock(timezone.now()).date()
         month_start = today.replace(day=1)
         if month_start.month == 12:
             month_end = month_start.replace(year=month_start.year + 1, month=1)
         else:
             month_end = month_start.replace(month=month_start.month + 1)
         return (
-            timezone.make_aware(
-                datetime.datetime.combine(month_start, datetime.time.min),
-                datetime.UTC,
+            to_true_utc(
+                timezone.make_aware(
+                    datetime.datetime.combine(month_start, datetime.time.min),
+                    datetime.UTC,
+                )
             ),
-            timezone.make_aware(
-                datetime.datetime.combine(month_end, datetime.time.min),
-                datetime.UTC,
+            to_true_utc(
+                timezone.make_aware(
+                    datetime.datetime.combine(month_end, datetime.time.min),
+                    datetime.UTC,
+                )
             ),
         )
 
@@ -115,9 +129,12 @@ class EventCreateView(StaffRequiredJSONMixin, View):
 
         if not recurrence_form.cleaned_data["is_recurring"]:
             event = form.save(commit=False)
+            event.start_at = to_true_utc(event.start_at)
+            if event.end_at:
+                event.end_at = to_true_utc(event.end_at)
             event.created_by = request.user
             event.save()
-            return JsonResponse(serialize_event(event, False), status=201)
+            return JsonResponse(serialize_event(event, False, 0), status=201)
 
         try:
             occurrence_starts = generate_occurrence_starts(
@@ -159,8 +176,11 @@ class EventCreateView(StaffRequiredJSONMixin, View):
                 title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"],
                 location=form.cleaned_data["location"],
-                start_at=occurrence_start,
-                end_at=occurrence_start + duration if duration else None,
+                meeting_link=form.cleaned_data["meeting_link"],
+                start_at=to_true_utc(occurrence_start),
+                end_at=to_true_utc(occurrence_start + duration)
+                if duration
+                else None,
                 recurring_group=group,
                 created_by=request.user,
             )
@@ -169,7 +189,7 @@ class EventCreateView(StaffRequiredJSONMixin, View):
         Event.objects.bulk_create(events)
 
         return JsonResponse(
-            [serialize_event(event, False) for event in events],
+            [serialize_event(event, False, 0) for event in events],
             safe=False,
             status=201,
         )
@@ -184,9 +204,14 @@ class EventUpdateView(StaffRequiredJSONMixin, View):
                 {"errors": form.errors.get_json_data()}, status=400
             )
 
-        form.save()
+        event = form.save(commit=False)
+        event.start_at = to_true_utc(event.start_at)
+        event.end_at = to_true_utc(event.end_at) if event.end_at else None
+        event.save()
         is_confirmed = event.confirmations.filter(user=request.user).exists()
-        return JsonResponse(serialize_event(event, is_confirmed))
+        return JsonResponse(
+            serialize_event(event, is_confirmed, event.confirmations.count())
+        )
 
 
 class EventDeleteView(StaffRequiredJSONMixin, View):
@@ -222,9 +247,27 @@ class EventConfirmView(LoginRequiredJSONMixin, View):
     def post(self, request, pk):
         event = get_object_or_404(Event, pk=pk)
         Confirmation.objects.get_or_create(user=request.user, event=event)
-        return JsonResponse(serialize_event(event, True))
+        return JsonResponse(
+            serialize_event(event, True, event.confirmations.count())
+        )
 
     def delete(self, request, pk):
         event = get_object_or_404(Event, pk=pk)
         Confirmation.objects.filter(user=request.user, event=event).delete()
         return HttpResponse(status=204)
+
+
+class EventIcsView(LoginRequiredMixin, View):
+    """Downloads a single event (or, for a recurring series, this one
+    occurrence) as an .ics file, for import into Outlook or other
+    calendar apps."""
+
+    def get(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        response = HttpResponse(
+            build_event_ics(event), content_type="text/calendar; charset=utf-8"
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="evento-{event.pk}.ics"'
+        )
+        return response

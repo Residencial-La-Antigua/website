@@ -30,6 +30,13 @@ SECRET_KEY = os.environ.get(
     "django-insecure-kl$u2lwydnb$jco@=fj1r6$v32qle(z7z$%v+&or@0$ci#cj6#",
 )
 
+# Salts the per-resident analytics ID (accounts/templatetags/analytics.py)
+# sent to Umami. Set the ANALYTICS_SALT environment variable in production.
+# The fallback below is for local development only and must never be used in production.
+ANALYTICS_SALT = os.environ.get(
+    "ANALYTICS_SALT", "insecure-dev-only-analytics-salt"
+)
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 

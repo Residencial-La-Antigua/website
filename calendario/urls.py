@@ -30,4 +30,9 @@ urlpatterns = [
         views.EventConfirmView.as_view(),
         name="calendario-eventos-confirmar",
     ),
+    path(
+        "eventos/<int:pk>/ics/",
+        views.EventIcsView.as_view(),
+        name="calendario-eventos-ics",
+    ),
 ]

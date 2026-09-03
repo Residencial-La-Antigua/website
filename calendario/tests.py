@@ -1,18 +1,25 @@
 import uuid
 from datetime import UTC, date, datetime, timedelta
+from datetime import timezone as dt_timezone
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
+from .ics import build_event_ics
 from .models import Confirmation, Event
 from .recurrence import (
     MAX_OCCURRENCES,
     TooManyOccurrences,
     generate_occurrence_starts,
 )
+from .timezones import to_local_wall_clock, to_true_utc
+from .validators import validate_meeting_link_domain
+from .views import EventListView
 
 User = get_user_model()
 
@@ -36,6 +43,63 @@ def create_user(username, is_active=True, is_staff=False):
         is_active=is_active,
         is_staff=is_staff,
     )
+
+
+class TimezonesTests(TestCase):
+    # A fixed offset (no DST) keeps the math unambiguous regardless 
+    # of the date used.
+    TEST_TZ = dt_timezone(timedelta(hours=3))
+
+    def test_to_true_utc_shifts_by_the_given_timezones_offset(self):
+        local = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
+        self.assertEqual(
+            to_true_utc(local, tz=self.TEST_TZ),
+            datetime(2026, 9, 25, 12, 0, tzinfo=UTC),
+        )
+
+    def test_to_true_utc_crosses_a_day_boundary(self):
+        local = datetime(2026, 9, 25, 1, 0, tzinfo=UTC)
+        self.assertEqual(
+            to_true_utc(local, tz=self.TEST_TZ),
+            datetime(2026, 9, 24, 22, 0, tzinfo=UTC),
+        )
+
+    def test_to_local_wall_clock_is_the_inverse_of_to_true_utc(self):
+        original = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
+        converted = to_true_utc(original, tz=self.TEST_TZ)
+        self.assertEqual(
+            to_local_wall_clock(converted, tz=self.TEST_TZ), original
+        )
+
+    def test_defaults_to_resident_tz_when_no_timezone_is_given(self):
+        # RESIDENT_TZ (Costa Rica, UTC-6) is the production default -
+        # this is the one test that pins that default, so a change to
+        # RESIDENT_TZ shows up here rather than silently everywhere.
+        local = datetime(2026, 9, 25, 15, 0, tzinfo=UTC)
+        self.assertEqual(
+            to_true_utc(local), datetime(2026, 9, 25, 21, 0, tzinfo=UTC)
+        )
+
+
+class MeetingLinkValidatorTests(TestCase):
+    def test_accepts_exact_allowed_domain(self):
+        validate_meeting_link_domain("https://meet.google.com/abc-defg-hij")
+
+    def test_accepts_subdomain_of_allowed_domain(self):
+        validate_meeting_link_domain("https://us02web.zoom.us/j/123456789")
+
+    def test_rejects_disallowed_domain(self):
+        with self.assertRaises(ValidationError):
+            validate_meeting_link_domain("https://example.com/meeting")
+
+    def test_rejects_domain_ending_in_allowed_domain_without_dot_boundary(
+        self,
+    ):
+        # "evilzoom.us" ends with "zoom.us" as a plain string, but isn't a
+        # subdomain of it. The check must require a "." boundary, not just
+        # a string suffix match.
+        with self.assertRaises(ValidationError):
+            validate_meeting_link_domain("https://evilzoom.us/j/123")
 
 
 @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
@@ -106,10 +170,24 @@ class EventListViewTests(TestCase):
     def test_no_params_uses_current_month(self):
         now = timezone.now()
         Event.objects.create(title="Este mes", start_at=now)
-        if now.month == 12:
-            other_month = now.replace(year=now.year + 1, month=1, day=1)
+
+        # Day 15 sits obviously, unambiguously in the middle of 
+        # "next month" so it clearly should not be included in 
+        # the "current month" results.
+        local_today = to_local_wall_clock(now).date()
+        if local_today.month == 12:
+            other_month_date = local_today.replace(
+                year=local_today.year + 1, month=1, day=15
+            )
         else:
-            other_month = now.replace(month=now.month + 1, day=1)
+            other_month_date = local_today.replace(
+                month=local_today.month + 1, day=15
+            )
+        other_month = to_true_utc(
+            datetime.combine(other_month_date, datetime.min.time()).replace(
+                hour=12, tzinfo=UTC
+            )
+        )
         Event.objects.create(title="Otro mes", start_at=other_month)
 
         response = self.client.get(reverse("calendario-eventos"))
@@ -118,6 +196,49 @@ class EventListViewTests(TestCase):
         titles = [event["title"] for event in response.json()]
         self.assertIn("Este mes", titles)
         self.assertNotIn("Otro mes", titles)
+
+    def test_event_exactly_at_next_month_start_is_excluded(self):
+        # The "current month" upper bound is exclusive (start_at__lt=end):
+        # an event sitting exactly on next month's first local midnight
+        # belongs to next month, not this one, and must not show up.
+        now = timezone.now()
+        local_today = to_local_wall_clock(now).date()
+        if local_today.month == 12:
+            next_month_start_date = local_today.replace(
+                year=local_today.year + 1, month=1, day=1
+            )
+        else:
+            next_month_start_date = local_today.replace(
+                month=local_today.month + 1, day=1
+            )
+        next_month_start = to_true_utc(
+            datetime.combine(
+                next_month_start_date, datetime.min.time()
+            ).replace(tzinfo=UTC)
+        )
+        Event.objects.create(
+            title="Inicio del siguiente mes", start_at=next_month_start
+        )
+
+        response = self.client.get(reverse("calendario-eventos"))
+
+        titles = [event["title"] for event in response.json()]
+        self.assertNotIn("Inicio del siguiente mes", titles)
+
+    def test_current_month_range_uses_costa_rica_local_date_not_utc_date(
+        self,
+    ):
+        # 2026-03-01T02:00:00Z is already March 1 in UTC, but still Feb
+        # 28 evening in Costa Rica (UTC-6). The "no params" fallback
+        # must resolve "today" using the resident-relevant local date,
+        # or it picks the wrong month for the first ~6 hours of every
+        # UTC day.
+        frozen_now = datetime(2026, 3, 1, 2, 0, tzinfo=UTC)
+        with patch("calendario.views.timezone.now", return_value=frozen_now):
+            start, end = EventListView._current_month_range()
+
+        self.assertEqual(start, datetime(2026, 2, 1, 6, 0, tzinfo=UTC))
+        self.assertEqual(end, datetime(2026, 3, 1, 6, 0, tzinfo=UTC))
 
     def test_confirmed_flag_is_specific_to_the_requesting_user(self):
         event = Event.objects.create(
@@ -131,6 +252,23 @@ class EventListViewTests(TestCase):
         data = response.json()
         self.assertEqual(len(data), 1)
         self.assertFalse(data[0]["extendedProps"]["confirmed"])
+
+    def test_confirmed_count_reflects_all_users_not_just_requesting_user(
+        self,
+    ):
+        event = Event.objects.create(
+            title="Café con vecinos", start_at=timezone.now()
+        )
+        other_resident = create_user("otro_residente")
+        Confirmation.objects.create(user=other_resident, event=event)
+        Confirmation.objects.create(
+            user=User.objects.get(username="residente"), event=event
+        )
+
+        response = self.client.get(reverse("calendario-eventos"))
+
+        data = response.json()
+        self.assertEqual(data[0]["extendedProps"]["confirmedCount"], 2)
 
 
 class EventCreateViewTests(TestCase):
@@ -169,6 +307,27 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(event.title, "Jornada de siembra")
         self.assertEqual(event.created_by, admin)
         self.assertEqual(response.json()["title"], "Jornada de siembra")
+        self.assertEqual(response.json()["extendedProps"]["confirmedCount"], 0)
+
+    def test_local_time_round_trips_through_storage_and_serialization(self):
+        # A resident types "15:00" meaning 15:00 local time (per RESIDENT_TZ). 
+        # The database must store the true UTC equivalent, not 15:00 UTC. 
+        # The API response must echo back the original "15:00" the resident typed,
+        # since the frontend displays whatever it's given as-is.
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Café con vecinos", "start_at": "2026-09-25T15:00"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = Event.objects.get()
+        self.assertEqual(
+            event.start_at, datetime(2026, 9, 25, 21, 0, tzinfo=UTC)
+        )
+        self.assertEqual(response.json()["start"], "2026-09-25T15:00:00+00:00")
 
     def test_staff_can_create_event_with_all_fields(self):
         create_user("admin", is_staff=True)
@@ -205,6 +364,48 @@ class EventCreateViewTests(TestCase):
         self.assertIn("title", errors)
         self.assertIn("start_at", errors)
 
+    def test_staff_can_create_event_with_allowed_meeting_link(self):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Café virtual",
+                "start_at": "2026-08-20T09:00",
+                "meeting_link": "https://us02web.zoom.us/j/123456789",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = Event.objects.get()
+        self.assertEqual(
+            event.meeting_link, "https://us02web.zoom.us/j/123456789"
+        )
+        self.assertEqual(
+            response.json()["extendedProps"]["meetingLink"],
+            "https://us02web.zoom.us/j/123456789",
+        )
+
+    def test_disallowed_meeting_link_domain_returns_error_without_creating(
+        self,
+    ):
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+
+        response = self.client.post(
+            reverse("calendario-eventos-crear"),
+            {
+                "title": "Café virtual",
+                "start_at": "2026-08-20T09:00",
+                "meeting_link": "https://example.com/meeting",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 0)
+        self.assertIn("meeting_link", response.json()["errors"])
+
     def test_recurring_weekly_with_count_creates_one_row_per_occurrence(self):
         create_user("admin", is_staff=True)
         self.client.login(username="admin", password="clave-segura-123")
@@ -223,9 +424,11 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Event.objects.count(), 3)
         events = list(Event.objects.order_by("start_at"))
+        # 18:00 Costa Rica (UTC-6) (per RESIDENT_TZ) is stored as 
+        # 00:00 UTC the *next* calendar day.
         self.assertEqual(
             [e.start_at.date().isoformat() for e in events],
-            ["2026-08-03", "2026-08-10", "2026-08-17"],
+            ["2026-08-04", "2026-08-11", "2026-08-18"],
         )
         self.assertEqual(len({e.recurring_group for e in events}), 1)
         self.assertIsNotNone(events[0].recurring_group)
@@ -250,10 +453,12 @@ class EventCreateViewTests(TestCase):
         events = list(Event.objects.order_by("start_at"))
         # Jan 31 + 1 month clamps to Feb 28 (2026 is not a leap year), then
         # Mar 31, then Apr 30 (April only has 30 days), then May 31 would
-        # exceed the May 1 end_date so it stops.
+        # exceed the May 1 end_date so it stops. Each is at 18:00 Costa
+        # Rica (UTC-6) (per RESIDENT_TZ), stored as 00:00 UTC the *next* 
+        # calendar day.
         self.assertEqual(
             [e.start_at.date().isoformat() for e in events],
-            ["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"],
+            ["2026-02-01", "2026-03-01", "2026-04-01", "2026-05-01"],
         )
 
     def test_recurring_preserves_duration_across_occurrences(self):
@@ -734,6 +939,18 @@ class EventConfirmViewTests(TestCase):
             ).exists()
         )
 
+    def test_confirmed_count_includes_other_users_existing_confirmations(
+        self,
+    ):
+        other_resident = create_user("otro_residente")
+        Confirmation.objects.create(user=other_resident, event=self.event)
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.post(self.confirm_url())
+
+        self.assertEqual(response.json()["extendedProps"]["confirmedCount"], 2)
+
     def test_confirming_nonexistent_event_returns_404(self):
         create_user("residente")
         self.client.login(username="residente", password="clave-segura-123")
@@ -743,3 +960,141 @@ class EventConfirmViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+
+class BuildEventIcsTests(TestCase):
+    def test_includes_core_fields(self):
+        event = Event.objects.create(
+            title="Café con vecinos",
+            description="Traer sillas",
+            location="Casa comunal",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+            end_at=datetime(2026, 9, 20, 16, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("BEGIN:VCALENDAR", ics)
+        self.assertIn("BEGIN:VEVENT", ics)
+        self.assertIn(f"UID:event-{event.pk}@arbolesdelaantigua.org", ics)
+        self.assertIn("DTSTART:20260920T150000Z", ics)
+        self.assertIn("DTEND:20260920T160000Z", ics)
+        self.assertIn("SUMMARY:Café con vecinos", ics)
+        self.assertIn("DESCRIPTION:Traer sillas", ics)
+        self.assertIn("LOCATION:Casa comunal", ics)
+
+    def test_missing_end_at_defaults_to_one_hour_duration(self):
+        event = Event.objects.create(
+            title="Café con vecinos",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("DTSTART:20260920T150000Z", ics)
+        self.assertIn("DTEND:20260920T160000Z", ics)
+
+    def test_meeting_link_is_appended_to_location(self):
+        event = Event.objects.create(
+            title="Reunión virtual",
+            location="Casa comunal",
+            meeting_link="https://us02web.zoom.us/j/123456789",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn(
+            "LOCATION:Casa comunal (https://us02web.zoom.us/j/123456789)",
+            ics,
+        )
+
+    def test_meeting_link_alone_is_used_as_location_when_no_location_set(
+        self,
+    ):
+        event = Event.objects.create(
+            title="Reunión virtual",
+            meeting_link="https://us02web.zoom.us/j/123456789",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn(
+            "LOCATION:https://us02web.zoom.us/j/123456789",
+            ics,
+        )
+
+    def test_escapes_special_characters_in_text_fields(self):
+        event = Event.objects.create(
+            title="Reunión; anual, café\\pan",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("SUMMARY:Reunión\\; anual\\, café\\\\pan", ics)
+
+
+@override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
+class EventIcsViewTests(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Café con vecinos",
+            start_at=datetime(2026, 8, 20, 18, 0, tzinfo=UTC),
+        )
+
+    def ics_url(self):
+        return reverse("calendario-eventos-ics", args=[self.event.pk])
+
+    def test_requires_authentication(self):
+        response = self.client.get(self.ics_url())
+        self.assertRedirects(
+            response,
+            f"{reverse('login')}?next={self.ics_url()}",
+        )
+
+    def test_resident_can_download(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.get(self.ics_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"], "text/calendar; charset=utf-8"
+        )
+        self.assertIn("attachment", response["Content-Disposition"])
+        self.assertIn(b"SUMMARY:Caf\xc3\xa9 con vecinos", response.content)
+
+    def test_downloading_nonexistent_event_returns_404(self):
+        create_user("residente")
+        self.client.login(username="residente", password="clave-segura-123")
+
+        response = self.client.get(
+            reverse("calendario-eventos-ics", args=[self.event.pk + 999])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_exported_time_matches_the_local_time_a_staff_member_typed(
+        self,
+    ):
+        # End-to-end regression test for the originally reported bug: a
+        # staff member creates an event meaning 15:00 Costa Rica local
+        # time, and the downloaded .ics must encode the true UTC
+        # equivalent (21:00Z), not the raw "15:00Z" Google Calendar/
+        # Outlook would otherwise mis-display 6 hours early.
+        create_user("admin", is_staff=True)
+        self.client.login(username="admin", password="clave-segura-123")
+        self.client.post(
+            reverse("calendario-eventos-crear"),
+            {"title": "Café virtual", "start_at": "2026-09-25T15:00"},
+        )
+        event = Event.objects.get(title="Café virtual")
+
+        response = self.client.get(
+            reverse("calendario-eventos-ics", args=[event.pk])
+        )
+
+        self.assertIn(b"DTSTART:20260925T210000Z", response.content)
