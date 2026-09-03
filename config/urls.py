@@ -25,6 +25,11 @@ urlpatterns = [
     path("calendario/", include("calendario.urls")),
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     path(
+        "noticias/",
+        TemplateView.as_view(template_name="noticias.html"),
+        name="noticias",
+    ),
+    path(
         "informacion/telefonos-importantes/",
         TemplateView.as_view(template_name="telefonos-importantes.html"),
         name="telefonos-importantes",

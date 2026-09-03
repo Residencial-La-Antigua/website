@@ -4,7 +4,8 @@
   max-width: 760px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  background-color: white;
+  background-color: var(--color-surface);
+  color: var(--color-text);
   border-radius: var(--radius);
 }
 
@@ -85,8 +86,8 @@
 /* Servicios públicos / Denuncias anónimas cards */
 
 .info-card {
-  background: #fff;
-  border: 1px solid #e2e2e2;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   transition: transform 0.3s ease-in-out;
@@ -115,7 +116,7 @@
   display: block;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #4a4a4a;
+  color: var(--color-text);
   text-decoration: none;
   margin: 0 0 0.25rem;
 }
@@ -127,7 +128,7 @@
 
 .info-card__number a,
 .info-card__number > a {
-  color: #111;
+  color: var(--color-text);
   text-decoration: none;
 }
 
@@ -138,7 +139,7 @@
 
 .info-card__meta {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-muted);
   margin: 0 0 0.5rem;
   line-height: 1.5;
 }
@@ -167,14 +168,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.9rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border);
   padding-top: 0.75rem;
 }
 
 .info-card__phone-list a {
   font-size: 1rem;
   font-weight: 600;
-  color: #4a4a4a;
+  color: var(--color-text);
   text-decoration: none;
 }
 
@@ -197,15 +198,15 @@
 
 .waste-when {
   font-size: 0.95rem;
-  color: #333;
+  color: var(--color-text);
   margin: 0 0 1rem;
   line-height: 1.6;
 }
 
 .waste-note {
   font-size: 0.8rem;
-  color: #666;
-  background: #f5f5f5;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-text) 7%, var(--color-surface));
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin: 1rem 0;
@@ -338,8 +339,8 @@
 }
 
 .stat-card {
-  background: #f5f5f5;
-  border: 1px solid #e2e2e2;
+  background: color-mix(in srgb, var(--color-text) 7%, var(--color-surface));
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   text-align: center;
@@ -347,14 +348,14 @@
 
 .stat-card__label {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-muted);
   margin: 0 0 0.35rem;
 }
 
 .stat-card__value {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #111;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -363,7 +364,25 @@
   max-width: 100%;
   height: auto;
   margin-top: 0.75rem;
-  border: 1px solid #e2e2e2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .phone-card--danger,
+[data-theme='dark'] .compare-col--no {
+  background: #3b2022;
+}
+
+[data-theme='dark'] .phone-card--danger :is(.phone-card__label, .phone-card__detail, .phone-card__number),
+[data-theme='dark'] .compare-col--no h3 {
+  color: #ffb4b4;
+}
+
+[data-theme='dark'] .compare-col--yes {
+  background: #173524;
+}
+
+[data-theme='dark'] .compare-col--yes h3 {
+  color: #9cddb1;
 }
