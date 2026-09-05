@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",
     "calendario",
+    "noticias",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

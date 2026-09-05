@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Noticias{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/noticias.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="noticias-page">
+  <h1>Noticias</h1>
+
+  {% if articles %}
+  <ul class="noticias-list">
+    {% for article in articles %}
+    <li class="noticia-card">
+      <a href="{% url 'noticias-detalle' article.slug %}">
+        {% if article.image %}
+        <img class="noticia-card__image" src="{% static article.image %}" alt="">
+        {% endif %}
+        <div class="noticia-card__body">
+          <span class="noticia-card__date">{{ article.date }}</span>
+          <h2 class="noticia-card__title">{{ article.title }}</h2>
+          {% if article.summary %}
+          <p class="noticia-card__summary">{{ article.summary }}</p>
+          {% endif %}
+        </div>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Todavía no hay noticias publicadas.</p>
+  {% endif %}
+</div>
+{% endblock %}
