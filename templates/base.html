@@ -13,28 +13,111 @@
     />
     <link rel="stylesheet" href="{% static 'css/reset.css' %}" />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/migration.css' %}?v=10" />
     {% block extra_css %}{% endblock %}
   </head>
-  <body>
-    <header class="site-header">
-      <a href="{% url 'home' %}" class="brand">Residencial La Antigua 🌿</a>
-      <nav class="site-nav">
-        {% if user.is_authenticated %}
-        <span class="greeting">Hola, {{ user.username }}</span>
-        <a href="{% url 'calendario' %}">Calendario</a>
-        <a href="{% url 'profile' %}">Mi cuenta</a>
-        <form method="post" action="{% url 'logout' %}" style="display: inline">
-          {% csrf_token %}
-          <button type="submit" class="btn-link">Cerrar sesión</button>
-        </form>
-        {% else %}
-        <a href="{% url 'login' %}">Iniciar sesión</a>
-        <a href="{% url 'signup' %}" class="btn">Registrarse</a>
-        {% endif %}
-      </nav>
+  <body class="{% block body_class %}{% endblock %}">
+    <header class="mig-header">
+      <a href="{% url 'home' %}" class="mig-brand">
+        <img src="{% static 'images/migration/general/logoADLA.JPG' %}" alt="" />
+        <span>Árboles de<br />la Antigua</span>
+      </a>
+
+      <button
+        type="button"
+        class="mig-menu-toggle"
+        data-mig-menu-toggle
+        aria-controls="mig-navigation"
+        aria-expanded="false"
+        aria-label="Abrir menú"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="mig-menu" id="mig-navigation" data-mig-menu>
+        <nav class="mig-primary-nav" aria-label="Navegación principal">
+          <a href="{% url 'home' %}">Inicio</a>
+          <a href="{% url 'noticias' %}">Noticias</a>
+          <a href="{% url 'telefonos-importantes' %}">Teléfonos Importantes</a>
+          <a href="{% url 'basura-y-reciclaje' %}">Basura y Reciclaje</a>
+          <a href="{% url 'desechos-no-tradicionales' %}">Desechos no tradicionales</a>
+          <a href="{% url 'calendario' %}">Calendario</a>
+        </nav>
+
+        <nav class="mig-account-nav" aria-label="Cuenta">
+          {% if user.is_authenticated %}
+          <span class="mig-greeting">Hola, {{ user.username }}</span>
+          <a href="{% url 'profile' %}">Mi cuenta</a>
+          <form method="post" action="{% url 'logout' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-link">Cerrar sesión</button>
+          </form>
+          {% else %}
+          <a href="{% url 'login' %}">Iniciar sesión</a>
+          <a href="{% url 'signup' %}" class="btn">Registrarse</a>
+          {% endif %}
+        </nav>
+      </div>
+
+      <div class="mig-controls">
+        {# Translation selector deferred until the collaboration team approves ES/EN/FR support. #}
+        <div class="mig-utilities">
+          <button
+            type="button"
+            class="mig-icon-button"
+            data-mig-theme-toggle
+            aria-label="Cambiar tema"
+            title="Cambiar tema"
+          >
+            <span class="mig-moon" aria-hidden="true">☾</span>
+            <span class="mig-sun" aria-hidden="true">☀</span>
+          </button>
+          <button
+            type="button"
+            class="mig-whatsapp-button"
+            data-dialog-template="mig-whatsapp-dialog"
+            aria-label="Acompáñanos por WhatsApp"
+          >
+            <img
+              src="{% static 'images/migration/general/WA.ico' %}"
+              alt=""
+              aria-hidden="true"
+            />
+            <span class="mig-whatsapp-label">Acompáñanos</span>
+          </button>
+        </div>
+      </div>
     </header>
 
-    <main class="container">
+    {% block page_hero %}
+    <section class="mig-page-hero-shell" aria-label="Bloque hero">
+      <div class="mig-page-hero">
+        <div class="mig-page-hero-logo-group" aria-hidden="true">
+          <div class="mig-page-hero-logo">
+            <img
+              src="{% static 'images/migration/general/logoADLA.JPG' %}"
+              alt=""
+            />
+          </div>
+        </div>
+        <h2>
+          Cuidamos los<br />
+          <span>árboles</span><br />
+          que nos cuidan.
+        </h2>
+        <div class="mig-page-hero-tools">
+          <p>
+            Somos una organización comunitaria dedicada a la preservación,
+            siembra y mantenimiento del patrimonio arbóreo.
+          </p>
+        </div>
+      </div>
+    </section>
+    {% endblock %}
+
+    <main class="{% block main_class %}container{% endblock %}">
       {% if messages %}
       <ul class="messages">
         {% for message in messages %}
@@ -47,6 +130,57 @@
     <footer>
       Desarrollado con ❤️ por y para los residentes de Residencial La Antigua 🌿
     </footer>
+    <div class="mig-dialog-overlay" data-mig-dialog-overlay hidden>
+      <section
+        class="mig-dialog"
+        data-mig-dialog
+        role="dialog"
+        aria-modal="true"
+        aria-label="Información"
+      >
+        <button
+          type="button"
+          class="mig-dialog-close"
+          data-mig-dialog-close
+          aria-label="Cerrar ventana"
+        >
+          ×
+        </button>
+        <div class="mig-dialog-content" data-mig-dialog-content></div>
+      </section>
+    </div>
+
+    <template id="mig-whatsapp-dialog">
+      <h2>Únase al Chat Vecinal de WhatsApp</h2>
+      <p>
+        Este chat está destinado únicamente para vecinos de Residencial La
+        Antigua y el ingreso está sujeto a aprobación de la administración del
+        grupo.
+      </p>
+      <p>
+        Su propósito es tratar exclusivamente temas para el mejoramiento de la
+        comunidad.
+      </p>
+      <p>
+        <strong>No se permite:</strong> política, religión, cadenas, memes ni
+        contenido fuera del objetivo comunitario.
+      </p>
+      <img
+        src="{% static 'images/migration/general/qrWA.jpg' %}"
+        alt="Código QR para ingresar al chat vecinal de WhatsApp"
+      />
+      <p class="mig-dialog-actions">
+        <a
+          class="mig-dialog-action"
+          href="https://chat.whatsapp.com/0Hf58PEkLmHKbxxUc3YxlO"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Unirme al chat de WhatsApp
+        </a>
+      </p>
+    </template>
+    <script src="{% static 'js/migration.js' %}?v=2" defer></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

@@ -1,5 +1,8 @@
 .git
 .venv
+.graphify-venv
+graphify-out
+.copilot
 __pycache__/
 *.py[oc]
 db.sqlite3
