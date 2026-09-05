@@ -1,6 +1,7 @@
 ---
-title: "Le damos la bienvenida a la nueva sección de Noticias"
-summary: "A partir de hoy, las novedades del residencial se publicarán aquí."
+title: 'Le damos la bienvenida a la nueva sección de Noticias'
+summary: 'A partir de hoy, las novedades del residencial se publicarán aquí.'
+draft: true
 ---
 
 A partir de hoy, **Residencial La Antigua** cuenta con una nueva sección de
