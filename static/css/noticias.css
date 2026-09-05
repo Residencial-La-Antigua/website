@@ -100,6 +100,28 @@
 
 .noticia-page__body {
   line-height: 1.7;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1rem;
+}
+
+/* Everything spans the full width by default (its own row); paragraphs
+   holding a single standalone image (Markdown wraps `![alt](src)` lines in
+   their own <p>) opt back into the 2-column track instead, so the grid's
+   auto-placement pairs them up two-per-row. A run of images of any length
+   pairs correctly, and text before/after always starts on a fresh row. */
+.noticia-page__body > * {
+  grid-column: 1 / -1;
+}
+
+.noticia-page__body p:has(> img:only-child) {
+  grid-column: auto;
+}
+
+@media (max-width: 480px) {
+  .noticia-page__body {
+    grid-template-columns: 1fr;
+  }
 }
 
 .noticia-page__body h2 {
@@ -116,4 +138,18 @@
   list-style: disc;
   margin: 0 0 1rem;
   padding-left: 1.25rem;
+}
+
+.noticia-page__body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 480px) {
+  .noticia-page__body p:has(> img:only-child) {
+    width: 100%;
+    margin: 0 0 1rem;
+  }
 }
