@@ -38,8 +38,13 @@ editar directamente desde la interfaz web de GitHub.
      sitio hasta que quites esa línea.
 
 4. Si el artículo lleva imágenes, súbelas a
-   `static/images/noticias/<slug>/` (mismo slug que el nombre del archivo)
-   y referencia la ruta relativa en el campo `image`.
+   `static/images/noticias/<slug>/` (mismo slug que el nombre del archivo).
+   La portada (la que aparece en la lista de noticias) va en el campo
+   `image`. Para agregar más imágenes dentro del cuerpo del artículo, usa
+   la misma ruta relativa con la sintaxis de imagen de Markdown:
+   ```
+   ![Descripción de la imagen](images/noticias/jornada-de-siembra/foto-1.jpg)
+   ```
 5. Guarda los cambios como un _pull request_ — alguien del equipo lo revisa
    y, al aprobarlo, el sitio se actualiza automáticamente.
 

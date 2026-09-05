@@ -51,6 +51,38 @@ class ContentParsingTests(TestCase):
         )
         self.assertIn("<strong>negrita</strong>", article.html)
 
+    @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
+    def test_resolves_inline_body_image_src_through_static(self):
+        with TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            write_article(
+                tmp_path,
+                "2026-01-15-con-imagen.md",
+                '---\ntitle: "Con imagen"\n---\n\n'
+                "![Foto](images/noticias/con-imagen/foto.jpg)\n",
+            )
+            with patch("noticias.content.CONTENT_DIR", tmp_path):
+                articles = list_articles()
+
+        self.assertIn(
+            'src="/static/images/noticias/con-imagen/foto.jpg"',
+            articles[0].html,
+        )
+
+    def test_leaves_absolute_image_urls_untouched(self):
+        with TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            write_article(
+                tmp_path,
+                "2026-01-15-imagen-externa.md",
+                '---\ntitle: "Imagen externa"\n---\n\n'
+                "![Foto](https://example.com/foto.jpg)\n",
+            )
+            with patch("noticias.content.CONTENT_DIR", tmp_path):
+                articles = list_articles()
+
+        self.assertIn('src="https://example.com/foto.jpg"', articles[0].html)
+
     def test_skips_file_without_a_title(self):
         with TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)

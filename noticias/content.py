@@ -6,10 +6,28 @@ import frontmatter
 import markdown
 import yaml
 from django.conf import settings
+from django.templatetags.static import static
 
 CONTENT_DIR = settings.BASE_DIR / "content" / "noticias"
 
 _FILENAME_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-(?P<slug>[a-z0-9-]+)\.md$")
+_IMG_SRC_RE = re.compile(r'(<img\b[^>]*\bsrc=")([^"]+)(")')
+
+
+def _resolve_image_srcs(html):
+    # Article bodies reference images the same way the `image` front matter
+    # field does: a path relative to the static root (e.g.
+    # "images/noticias/<slug>/foto.jpg"), not a literal URL. Resolving it
+    # through Django's static() here - rather than leaving it for the
+    # template - keeps this in sync with STATIC_URL/storage the same way
+    # {% static %} would.
+    def replace(match):
+        prefix, src, suffix = match.groups()
+        if src.startswith(("http://", "https://", "/")):
+            return match.group(0)
+        return f"{prefix}{static(src)}{suffix}"
+
+    return _IMG_SRC_RE.sub(replace, html)
 
 
 @dataclass
@@ -49,8 +67,8 @@ def _parse_file(path):
         title=str(title),
         summary=str(post.get("summary", "")),
         image=str(image) if image is not None else None,
-        html=markdown.markdown(
-            post.content, extensions=["extra", "sane_lists"]
+        html=_resolve_image_srcs(
+            markdown.markdown(post.content, extensions=["extra", "sane_lists"])
         ),
     )
 
