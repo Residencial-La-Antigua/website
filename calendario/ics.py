@@ -6,6 +6,10 @@ _DEFAULT_DURATION = datetime.timedelta(hours=1)
 
 
 def _escape_text(value):
+    # Normalize Windows (\r\n) and old-Mac (\r) line endings to \n first,
+    # so every line break ends up correctly escaped regardless of what
+    # convention the original text used.
+    value = value.replace("\r\n", "\n").replace("\r", "\n")
     return (
         value.replace("\\", "\\\\")
         .replace(";", "\\;")

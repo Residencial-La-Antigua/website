@@ -1035,6 +1035,21 @@ class BuildEventIcsTests(TestCase):
 
         self.assertIn("SUMMARY:Reunión\\; anual\\, café\\\\pan", ics)
 
+    def test_normalizes_windows_style_line_breaks_before_escaping(self):
+        event = Event.objects.create(
+            title="Reunión de vecinos",
+            description="Traer sillas\r\nY snacks",
+            start_at=datetime(2026, 9, 20, 15, 0, tzinfo=UTC),
+        )
+
+        ics = build_event_ics(event)
+
+        self.assertIn("DESCRIPTION:Traer sillas\\nY snacks", ics)
+        # Every \r in the file must be part of a legitimate \r\n line
+        # terminator - none should be left over from the description's
+        # own line break, which must be escaped as literal "\n" text.
+        self.assertNotIn("\r", ics.replace("\r\n", ""))
+
 
 @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
 class EventIcsViewTests(TestCase):
