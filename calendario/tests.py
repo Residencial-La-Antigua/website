@@ -46,7 +46,7 @@ def create_user(username, is_active=True, is_staff=False):
 
 
 class TimezonesTests(TestCase):
-    # A fixed offset (no DST) keeps the math unambiguous regardless 
+    # A fixed offset (no DST) keeps the math unambiguous regardless
     # of the date used.
     TEST_TZ = dt_timezone(timedelta(hours=3))
 
@@ -171,8 +171,8 @@ class EventListViewTests(TestCase):
         now = timezone.now()
         Event.objects.create(title="Este mes", start_at=now)
 
-        # Day 15 sits obviously, unambiguously in the middle of 
-        # "next month" so it clearly should not be included in 
+        # Day 15 sits obviously, unambiguously in the middle of
+        # "next month" so it clearly should not be included in
         # the "current month" results.
         local_today = to_local_wall_clock(now).date()
         if local_today.month == 12:
@@ -310,8 +310,8 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(response.json()["extendedProps"]["confirmedCount"], 0)
 
     def test_local_time_round_trips_through_storage_and_serialization(self):
-        # A resident types "15:00" meaning 15:00 local time (per RESIDENT_TZ). 
-        # The database must store the true UTC equivalent, not 15:00 UTC. 
+        # A resident types "15:00" meaning 15:00 local time (per RESIDENT_TZ).
+        # The database must store the true UTC equivalent, not 15:00 UTC.
         # The API response must echo back the original "15:00" the resident typed,
         # since the frontend displays whatever it's given as-is.
         create_user("admin", is_staff=True)
@@ -424,7 +424,7 @@ class EventCreateViewTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Event.objects.count(), 3)
         events = list(Event.objects.order_by("start_at"))
-        # 18:00 Costa Rica (UTC-6) (per RESIDENT_TZ) is stored as 
+        # 18:00 Costa Rica (UTC-6) (per RESIDENT_TZ) is stored as
         # 00:00 UTC the *next* calendar day.
         self.assertEqual(
             [e.start_at.date().isoformat() for e in events],
@@ -454,7 +454,7 @@ class EventCreateViewTests(TestCase):
         # Jan 31 + 1 month clamps to Feb 28 (2026 is not a leap year), then
         # Mar 31, then Apr 30 (April only has 30 days), then May 31 would
         # exceed the May 1 end_date so it stops. Each is at 18:00 Costa
-        # Rica (UTC-6) (per RESIDENT_TZ), stored as 00:00 UTC the *next* 
+        # Rica (UTC-6) (per RESIDENT_TZ), stored as 00:00 UTC the *next*
         # calendar day.
         self.assertEqual(
             [e.start_at.date().isoformat() for e in events],

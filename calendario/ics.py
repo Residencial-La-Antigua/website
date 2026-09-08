@@ -24,7 +24,7 @@ def _format_datetime(value):
 
 def build_event_ics(event):
     """Renders a single event as a minimal RFC 5545 VCALENDAR/VEVENT.
-    Recurring events are stored as one row per occurrence, so this 
+    Recurring events are stored as one row per occurrence, so this
     always describes one concrete occurrence, never a recurrence rule
     i.e. each occurrence is exported independently."""
 

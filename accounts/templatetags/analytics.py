@@ -5,6 +5,7 @@ from django.conf import settings
 
 register = template.Library()
 
+
 @register.filter
 def analytics_id(user):
     """A stable, non-reversible per-resident ID for Umami's identify(),
