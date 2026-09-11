@@ -1,7 +1,6 @@
 ---
 title: "La cuadrilla celebra el fin de temporada con su primer encuentro presencial"
 summary: "La cuadrilla se reúne por primera vez de manera presencial para celebrar el cierre de temporada y discutir los resultados de su trabajo."
-draft: true
 ---
 
 ![Los Cuadrilleros se lucen con sus nuevas gorras](images/noticias/primera-reunion-de-cuadrilla/01.jpg)
