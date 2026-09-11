@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/noticias.css' %}">
+{% endblock %}
+
+{% block content %}
+<article class="noticia-page">
+  <a class="noticia-page__back" href="{% url 'noticias' %}">&larr; Volver a Noticias</a>
+  <span class="noticia-page__date">{{ article.date }}</span>
+  <h1>{{ article.title }}</h1>
+  {% if article.image %}
+  <img class="noticia-page__image" src="{% static article.image %}" alt="">
+  {% endif %}
+  <div class="noticia-page__body">{{ article.html|safe }}</div>
+</article>
+{% endblock %}
