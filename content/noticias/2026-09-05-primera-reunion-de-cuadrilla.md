@@ -1,11 +1,10 @@
 ---
-title: "La cuadrilla celebra el fin de temporada con su primer encuentro presencial"
-summary: "La cuadrilla se reúne por primera vez de manera presencial para celebrar el cierre de temporada y discutir los resultados de su trabajo."
+title: 'La cuadrilla celebra el fin de temporada con su primer encuentro presencial'
+summary: 'La cuadrilla se reúne por primera vez de manera presencial para celebrar el cierre de temporada y discutir los resultados de su trabajo.'
+image: images/noticias/primera-reunion-de-cuadrilla/01.jpg
 ---
 
-![Los Cuadrilleros se lucen con sus nuevas gorras](images/noticias/primera-reunion-de-cuadrilla/01.jpg)
-
-La cuadrilla celebra el fin de temporada con su primer encuentro presencial
+_Los Cuadrilleros lucen sus gorras nuevas durante su primer encuentro presencial, en el que celebraron el fin de la temporada de siembra de este año._
 
 5 de septiembre de 2026. Quince de los aproximadamente 20 miembros de la Cuadrilla del programa Árboles de La Antigua se reunieron en la casa de Guillermo Corrales y Rosa Jiménez para compartir una comida, conocerse mejor y conversar sobre temas relacionados con su labor. La Cuadrilla está integrada por vecinos voluntarios que participan en jornadas para sembrar árboles y arbustos y darles mantenimiento en el Residencial La Antigua, en Tres Ríos de La Unión. La vecina Cornelia Miller comentó: “En lo personal disfruté mucho de la hermosa terraza y la decoración de las mesas; el ambiente fue perfecto para esta primera reunión de la Cuadrilla”. El encuentro también sirvió para celebrar el cierre de la temporada de siembra y el crecimiento del grupo de voluntarios que durante el año ha venido apoyando la siembra y el mantenimiento de árboles y arbustos en el residencial.
 
