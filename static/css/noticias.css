@@ -118,6 +118,11 @@
   grid-column: auto;
 }
 
+.noticia-page__body p:has(> img.noticia-img--wide) {
+  grid-column: 1 / -1;
+  padding: 1rem 5rem;
+}
+
 @media (max-width: 480px) {
   .noticia-page__body {
     grid-template-columns: 1fr;
