@@ -152,6 +152,10 @@
   border-radius: var(--radius);
 }
 
+.noticia-page__body iframe {
+  margin: 1rem auto;
+}
+
 @media (max-width: 480px) {
   .noticia-page__body p:has(> img:only-child) {
     width: 100%;
