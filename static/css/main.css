@@ -180,7 +180,8 @@ body:has(.hero-masonry) footer {
   margin-bottom: 0.75rem;
 }
 
-.card > .basic-info-links li {
+.card > .basic-info-links li,
+.card > .news-links li {
   margin: 0.5rem 0;
 }
 
