@@ -33,11 +33,13 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANALYTICS_SALT: ${{ secrets.ANALYTICS_SALT }}
         run: |
           {
             echo "SECRET_KEY=$SECRET_KEY"
             echo "ALLOWED_HOSTS=$ALLOWED_HOSTS"
             echo "DATABASE_URL=$DATABASE_URL"
+            echo "ANALYTICS_SALT=$ANALYTICS_SALT"
           } > .env
 
       - name: Build image

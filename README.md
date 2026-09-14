@@ -28,6 +28,10 @@ El conjunto de funcionalidades se ha organizado en 7 módulos funcionales:
 - **Información básica:** páginas de referencia con teléfonos importantes, recolección de basura y reciclaje, y desechos no tradicionales.
 - **Calendario de eventos:** vista mensual navegable por mes y año, creación y edición de eventos únicos o recurrentes (diarios, semanales o mensuales) por parte de administradores, y confirmación o cancelación de asistencia por parte de los vecinos, con historial de confirmaciones consultable desde el panel de administración.
 
+## Analítica
+
+El sitio usa [Umami](https://umami.is/) para medir visitas al portal, sin cookies ni datos personales.
+
 ## Cómo contribuir
 
 - El seguimiento y priorización de funcionalidades se realiza en el [tablero de GitHub Project](https://github.com/orgs/Residencial-La-Antigua/projects/1).
