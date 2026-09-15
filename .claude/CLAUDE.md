@@ -51,3 +51,17 @@ All the granular, story-by-story work stays on the feature branch and only colla
 - Before force-pushing, verify with `git diff origin/<branch> <branch>
 --stat` and `git merge-base` — use `--force-with-lease`, never a raw
   `--force`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as GitHub issues in `Residencial-La-Antigua/website`, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+See `docs/agents/domain.md`.
