@@ -210,3 +210,7 @@
 #event-form-recurrence-fields input[type='radio'] {
   margin-bottom: 0;
 }
+
+#event-modal-export {
+  font-size: 0.75rem;
+}

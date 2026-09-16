@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
     eventClick: function (info) {
       showEventDetail(info.event);
     },
+    eventDidMount: function (info) {
+      info.el.title = info.event.title;
+    },
     datesSet: function (info) {
       yearSelect.value = String(info.view.currentStart.getUTCFullYear());
     },
@@ -96,9 +99,28 @@ document.addEventListener('DOMContentLoaded', function () {
       ? 'Ubicación: ' + eventLocation
       : '';
 
+    var meetingLink = event.extendedProps.meetingLink;
+    var meetingLinkEl = document.getElementById('event-modal-meeting-link');
+    meetingLinkEl.hidden = !meetingLink;
+    if (meetingLink) {
+      var meetingLinkAnchor = document.getElementById(
+        'event-modal-meeting-link-anchor',
+      );
+      meetingLinkAnchor.href = meetingLink;
+      meetingLinkAnchor.textContent = meetingLink;
+    }
+
     var description = event.extendedProps.description;
     document.getElementById('event-modal-description').textContent =
       description || 'Sin descripción.';
+
+    document.getElementById('event-modal-confirmed-count-value').textContent =
+      String(event.extendedProps.confirmedCount || 0);
+
+    document.getElementById('event-modal-google-calendar-link').href =
+      buildGoogleCalendarUrl(event);
+    document.getElementById('event-modal-ics-link').href =
+      eventsUrl + event.id + '/ics/';
 
     modal.dataset.eventId = event.id;
 
@@ -138,6 +160,45 @@ document.addEventListener('DOMContentLoaded', function () {
     return formattedStart + ' — ' + formattedEnd;
   }
 
+  // The backend's JSON API (see calendario/views.py's serialize_event)
+  // deliberately keeps sending event times as Costa Rica wall-clock
+  // numbers labeled UTC (`timeZone: 'UTC'`). `toRealUtc` ensures the
+  // database now stores genuine UTC. Google Calendar's own `dates` param
+  // only accepts true UTC and converts it to the viewer's real local time.
+  var RESIDENT_LOCAL_UTC_OFFSET_MS = 6 * 60 * 60 * 1000;
+
+  function toRealUtc(date) {
+    return new Date(date.getTime() + RESIDENT_LOCAL_UTC_OFFSET_MS);
+  }
+
+  function buildGoogleCalendarUrl(event) {
+    // Default to a 1-hour event if no end time is provided (Google
+    // Calendar requires an end time)
+    var rawEnd = event.end || new Date(event.start.getTime() + 60 * 60 * 1000);
+    var start = toRealUtc(event.start);
+    var end = toRealUtc(rawEnd);
+
+    var location = event.extendedProps.location || '';
+    var meetingLink = event.extendedProps.meetingLink;
+    if (meetingLink) {
+      location = location ? location + ' (' + meetingLink + ')' : meetingLink;
+    }
+
+    var params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: event.title,
+      dates:
+        formatGoogleCalendarDate(start) + '/' + formatGoogleCalendarDate(end),
+      details: event.extendedProps.description || '',
+      location: location,
+    });
+    return 'https://calendar.google.com/calendar/render?' + params.toString();
+  }
+
+  function formatGoogleCalendarDate(date) {
+    return date.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  }
+
   function getCsrfToken() {
     var input = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]');
     return input ? input.value : '';
@@ -167,6 +228,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('event-form-title').value = event.title;
     document.getElementById('event-form-location').value =
       event.extendedProps.location || '';
+    document.getElementById('event-form-meeting-link').value =
+      event.extendedProps.meetingLink || '';
     document.getElementById('event-form-description').value =
       event.extendedProps.description || '';
     document.getElementById('event-form-start').value = toDatetimeLocalValue(
@@ -294,13 +357,22 @@ document.addEventListener('DOMContentLoaded', function () {
       }).then(function (response) {
         if (response.ok) {
           setConfirmButtonState(confirmButton, !isConfirmed);
+
+          var countEl = document.getElementById(
+            'event-modal-confirmed-count-value',
+          );
+          var newCount =
+            Number(countEl.textContent || 0) + (isConfirmed ? -1 : 1);
+          countEl.textContent = String(newCount);
+
           // FullCalendar keeps its own cached copy of each event's
           // extendedProps, reused as-is (no refetch) when the same event
           // is clicked again. Without updating it here too, reopening
           // this event later in the same page session would read the
-          // stale pre-confirm value and reset the button incorrectly.
+          // stale pre-confirm/pre-count value and reset the UI incorrectly.
           if (currentEvent) {
             currentEvent.setExtendedProp('confirmed', !isConfirmed);
+            currentEvent.setExtendedProp('confirmedCount', newCount);
           }
         }
       });

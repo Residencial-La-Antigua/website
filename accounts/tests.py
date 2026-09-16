@@ -1,11 +1,15 @@
+import hashlib
 from datetime import UTC, datetime
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from calendario.models import Confirmation, Event
+
+from .templatetags.analytics import analytics_id
 
 User = get_user_model()
 
@@ -40,6 +44,35 @@ def create_superuser(username):
         street="Calle Principal",
         house_number="1",
     )
+
+
+class AnalyticsIdFilterTests(TestCase):
+    def test_anonymous_user_gets_empty_string(self):
+        self.assertEqual(analytics_id(AnonymousUser()), "")
+
+    def test_authenticated_user_gets_a_stable_hash(self):
+        user = create_user("residente")
+        self.assertEqual(analytics_id(user), analytics_id(user))
+        self.assertNotEqual(analytics_id(user), "")
+
+    def test_different_users_get_different_hashes(self):
+        user_a = create_user("residente_a")
+        user_b = create_user("residente_b")
+        self.assertNotEqual(analytics_id(user_a), analytics_id(user_b))
+
+    def test_hash_uses_the_salt_and_sha256_truncated_to_16_chars(self):
+        user = create_user("residente")
+        expected = hashlib.sha256(
+            f"{settings.ANALYTICS_SALT}:{user.pk}".encode()
+        ).hexdigest()[:16]
+        self.assertEqual(analytics_id(user), expected)
+
+    def test_reads_the_salt_from_settings_not_a_hardcoded_value(self):
+        user = create_user("residente")
+        before = analytics_id(user)
+        with override_settings(ANALYTICS_SALT="una-sal-completamente-distinta"):
+            after = analytics_id(user)
+        self.assertNotEqual(before, after)
 
 
 @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)

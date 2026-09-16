@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from .validators import validate_meeting_link_domain
+
 
 class Event(models.Model):
     """A single calendar occurrence. Recurring events are stored as one row
@@ -10,6 +12,11 @@ class Event(models.Model):
     title = models.CharField("título", max_length=200)
     description = models.TextField("descripción", blank=True)
     location = models.CharField("ubicación", max_length=200, blank=True)
+    meeting_link = models.URLField(
+        "enlace de reunión virtual",
+        blank=True,
+        validators=[validate_meeting_link_domain],
+    )
     start_at = models.DateTimeField("fecha y hora de inicio")
     end_at = models.DateTimeField("fecha y hora de fin", null=True, blank=True)
     recurring_group = models.UUIDField(
