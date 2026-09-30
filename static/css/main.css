@@ -939,3 +939,116 @@ form .helptext {
   background-color: var(--color-error-bg);
   color: var(--color-error-text);
 }
+
+/* ---------- Responsive ---------- */
+
+/* min-width: 780px and max-width: 780px both fire at exactly 780px —
+   inherited from the mockup, not something to "fix" here; the redesign's
+   desktop rules above and the mobile rules below intentionally overlap
+   at that boundary. */
+@media (max-width: 780px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .hero-photo {
+    position: static;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-scrim {
+    display: none;
+  }
+
+  .hero-panel {
+    width: 100%;
+    background: #1b2a21;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 2rem 24px 2.25rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.9rem 24px 1.25rem;
+  }
+
+  .site-nav.is-open {
+    display: flex;
+  }
+
+  .site-nav a:not(.btn) {
+    padding: 0.5rem 0.1rem;
+  }
+
+  .site-nav .btn {
+    width: 100%;
+    margin-top: 0.2rem;
+  }
+
+  .hero-news-title {
+    text-align: left;
+  }
+
+  .hero-news-thumb {
+    width: 120px;
+    height: 120px;
+  }
+
+  .nav-dropdown-label {
+    pointer-events: none;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .nav-dropdown-label::after {
+    display: none;
+  }
+
+  .nav-dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0.9rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .info-strip .wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  footer .foot-right {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
