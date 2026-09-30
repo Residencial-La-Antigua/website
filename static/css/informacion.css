@@ -1,7 +1,7 @@
 /* Shared styles for the /informacion/ section */
 
 .info-page {
-  max-width: 760px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
   background-color: white;
@@ -26,7 +26,7 @@
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1rem;
 }
 
@@ -40,6 +40,7 @@
   border-radius: 12px;
   padding: 1rem;
   transition: transform 0.3s ease-in-out;
+  text-align: center;
 }
 
 .phone-card:hover {
@@ -90,6 +91,12 @@
   border-radius: 12px;
   padding: 1rem 1.25rem;
   transition: transform 0.3s ease-in-out;
+}
+
+.info-card h4 {
+  font-size: 0.9rem;
+  margin-top: 0.9rem;
+  margin-bottom: 0.6rem;
 }
 
 .info-card:hover {
