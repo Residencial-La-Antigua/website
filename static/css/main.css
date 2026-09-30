@@ -272,7 +272,10 @@ a:hover {
   display: none;
 }
 
-@media (min-width: 780px) {
+/* The full inline nav (and its hover dropdown) only has room from the
+   "large desktop" breakpoint up — below that the hamburger menu is used
+   instead, see the max-width: 1024px block below. */
+@media (min-width: 1025px) {
   .nav-dropdown-label {
     cursor: default;
   }
@@ -318,9 +321,7 @@ a:hover {
   .nav-dropdown-menu li a:hover {
     background: var(--color-primary-pale);
   }
-}
 
-@media (min-width: 1025px) {
   .site-header .wrap {
     padding-inline: 48px;
   }
@@ -995,6 +996,20 @@ form .helptext {
     padding: 2rem 24px 2.25rem;
   }
 
+  .hero-news-title {
+    text-align: left;
+  }
+
+  .hero-news-thumb {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* The inline nav's links don't fit at 780px, so the hamburger menu is
+   kept all the way up to the "large desktop" breakpoint (1025px), not
+   just the mobile/tablet 780px breakpoint used for the hero layout. */
+@media (max-width: 1024px) {
   .menu-toggle {
     display: inline-flex;
   }
@@ -1024,15 +1039,6 @@ form .helptext {
   .site-nav .btn {
     width: 100%;
     margin-top: 0.2rem;
-  }
-
-  .hero-news-title {
-    text-align: left;
-  }
-
-  .hero-news-thumb {
-    width: 120px;
-    height: 120px;
   }
 
   .nav-dropdown-label {
