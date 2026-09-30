@@ -1,10 +1,39 @@
 /* Shared styles for the /informacion/ section */
 
+:root {
+  --info-danger-bg: #fcebeb;
+  --info-danger-text: #791f1f;
+  --info-ok-bg: #eaf6ec;
+  --info-ok-text: #276b38;
+  --info-fail-bg: #fbeaea;
+  --info-fail-text: #8a2c2c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --info-danger-bg: #3a2020;
+    --info-danger-text: #f0a8a8;
+    --info-ok-bg: #1d2f22;
+    --info-ok-text: #8fd9a8;
+    --info-fail-bg: #332020;
+    --info-fail-text: #e8a3a3;
+  }
+}
+
+:root[data-theme='dark'] {
+  --info-danger-bg: #3a2020;
+  --info-danger-text: #f0a8a8;
+  --info-ok-bg: #1d2f22;
+  --info-ok-text: #8fd9a8;
+  --info-fail-bg: #332020;
+  --info-fail-text: #e8a3a3;
+}
+
 .info-page {
   max-width: 960px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  background-color: white;
+  background-color: var(--color-surface);
   border-radius: var(--radius);
 }
 
@@ -48,7 +77,7 @@
 }
 
 .phone-card--danger {
-  background: #fcebeb;
+  background: var(--info-danger-bg);
 }
 
 .card-icon {
@@ -58,14 +87,14 @@
 
 .phone-card__label {
   font-size: 1rem;
-  color: #791f1f;
+  color: var(--info-danger-text);
   margin: 0;
   line-height: 1.4;
 }
 
 .phone-card__detail {
   font-size: 0.8rem;
-  color: #791f1f;
+  color: var(--info-danger-text);
   margin: 0.35rem 0;
   display: block;
 }
@@ -74,20 +103,20 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #791f1f;
+  color: var(--info-danger-text);
   text-decoration: none;
 }
 
 .phone-card__number:hover,
 .phone-card__number:focus {
-  color: #791f1f;
+  color: var(--info-danger-text);
 }
 
 /* Servicios públicos / Denuncias anónimas cards */
 
 .info-card {
-  background: #fff;
-  border: 1px solid #e2e2e2;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   transition: transform 0.3s ease-in-out;
@@ -122,7 +151,7 @@
   display: block;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #4a4a4a;
+  color: var(--color-text);
   text-decoration: none;
   margin: 0 0 0.25rem;
 }
@@ -134,7 +163,7 @@
 
 .info-card__number a,
 .info-card__number > a {
-  color: #111;
+  color: var(--color-text);
   text-decoration: none;
 }
 
@@ -145,20 +174,20 @@
 
 .info-card__meta {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-muted);
   margin: 0 0 0.5rem;
   line-height: 1.5;
 }
 
 .info-card__link {
   font-size: 0.85rem;
-  color: #185fa5;
+  color: var(--color-secondary);
   text-decoration: none;
 }
 
 .info-card__link:hover,
 .info-card__link:focus {
-  color: #185fa5;
+  color: var(--color-secondary);
   text-decoration: underline;
 }
 
@@ -174,20 +203,20 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.9rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border-soft);
   padding-top: 0.75rem;
 }
 
 .info-card__phone-list a {
   font-size: 1rem;
   font-weight: 600;
-  color: #4a4a4a;
+  color: var(--color-text);
   text-decoration: none;
 }
 
 .info-card__phone-list a:hover,
 .info-card__phone-list a:focus {
-  color: #111;
+  color: var(--color-primary-dark);
   text-decoration: underline;
 }
 
@@ -204,15 +233,15 @@
 
 .waste-when {
   font-size: 0.95rem;
-  color: #333;
+  color: var(--color-text);
   margin: 0 0 1rem;
   line-height: 1.6;
 }
 
 .waste-note {
   font-size: 0.8rem;
-  color: #666;
-  background: #f5f5f5;
+  color: var(--color-text-muted);
+  background: var(--color-border-soft);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin: 1rem 0;
@@ -243,19 +272,19 @@
 }
 
 .compare-col--yes {
-  background: #eaf6ec;
+  background: var(--info-ok-bg);
 }
 
 .compare-col--yes h3 {
-  color: #276b38;
+  color: var(--info-ok-text);
 }
 
 .compare-col--no {
-  background: #fbeaea;
+  background: var(--info-fail-bg);
 }
 
 .compare-col--no h3 {
-  color: #8a2c2c;
+  color: var(--info-fail-text);
 }
 
 .compare-col a {
@@ -345,8 +374,8 @@
 }
 
 .stat-card {
-  background: #f5f5f5;
-  border: 1px solid #e2e2e2;
+  background: var(--color-border-soft);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   text-align: center;
@@ -354,14 +383,14 @@
 
 .stat-card__label {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-muted);
   margin: 0 0 0.35rem;
 }
 
 .stat-card__value {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #111;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -370,7 +399,7 @@
   max-width: 100%;
   height: auto;
   margin-top: 0.75rem;
-  border: 1px solid #e2e2e2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
