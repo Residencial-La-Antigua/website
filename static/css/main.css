@@ -334,6 +334,12 @@ a:hover {
   margin: 6vh auto 1vh;
 }
 
+/* The hero is full-bleed and sits flush against the header; it doesn't
+   want the vertical breathing room other pages' centered cards get. */
+.container:has(> .hero) {
+  margin: 0 auto;
+}
+
 /* ---------- Hero ---------- */
 
 .accent {
