@@ -25,7 +25,6 @@
         <div class="header-controls">
           <nav class="site-nav" id="site-nav">
             {% if user.is_authenticated %}
-            <span class="nav-greeting">Hola, {{ user.username }}</span>
             <a href="{% url 'noticias' %}">Noticias</a>
             <a href="{% url 'calendario' %}">Calendario</a>
             <div class="nav-dropdown">
