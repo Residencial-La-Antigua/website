@@ -373,7 +373,7 @@ a:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 40%;
+  object-position: 76% 40%;
   z-index: 0;
 }
 
