@@ -14,6 +14,7 @@
 //   text <selector>           prints textContent
 //   value <selector>          prints the input/select value
 //   eval <js>                 runs JS in the page, prints the JSON result
+//   viewport <width> <height> resizes the page viewport (for responsive checks)
 //   screenshot [name]         saves to ./screenshots/<name-or-counter>.png
 //   console                   prints collected console.error/pageerror lines
 //   quit | exit
@@ -113,6 +114,12 @@ async function runCommand(line) {
     case "eval": {
       const result = await page.evaluate(new Function(`return (${rest})`));
       console.log(`EVAL = ${JSON.stringify(result)}`);
+      break;
+    }
+    case "viewport": {
+      const [width, height] = splitArgs(rest).map(Number);
+      await page.setViewportSize({ width, height });
+      console.log(`OK viewport ${width}x${height}`);
       break;
     }
     case "screenshot": {
