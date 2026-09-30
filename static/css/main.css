@@ -106,7 +106,7 @@ a:hover {
 /* Shared wrapper for chrome and full-width sections */
 
 .wrap {
-  max-width: 1160px;
+  max-width: 1080px;
   margin: 0 auto;
   padding-inline: 24px;
 }
