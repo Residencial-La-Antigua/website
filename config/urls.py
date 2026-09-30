@@ -19,12 +19,14 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
 
+from .views import HomeView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("calendario/", include("calendario.urls")),
     path("noticias/", include("noticias.urls")),
-    path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path("", HomeView.as_view(), name="home"),
     path(
         "informacion/telefonos-importantes/",
         TemplateView.as_view(template_name="telefonos-importantes.html"),

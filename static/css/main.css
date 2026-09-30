@@ -334,66 +334,393 @@ a:hover {
   margin: 6vh auto 1vh;
 }
 
-/* Decorative masonry background (home page) */
+/* ---------- Hero ---------- */
 
-.container:has(.hero-masonry) {
+.accent {
+  font-style: italic;
+  font-weight: 500;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  margin: 0 0 0.6rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-photo {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  z-index: 0;
+}
+
+.hero-tag {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem 0.4rem 1.8rem;
+  align-items: center;
+}
+
+.hero-tag::before {
+  content: '';
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(8, 14, 10, 0.5) 0%,
+    rgba(8, 14, 10, 0.22) 55%,
+    rgba(8, 14, 10, 0) 85%
+  );
+  pointer-events: none;
+}
+
+/* In-flow on mobile: the panel's own height is what sizes .hero, so the
+   photo (absolutely filling .hero) ends up exactly as tall as the panel. */
+.hero-panel {
+  position: relative;
+  z-index: 2;
+  width: min(320px, 84vw);
+  background: var(--hero-panel-bg);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 1.5rem 1.5rem 1.75rem;
+  text-align: center;
+}
+
+.hero-brand-mark {
+  appearance: none;
+  font: inherit;
+  margin: 0;
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease;
 }
 
-body:has(.hero-masonry) footer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
+.hero-brand-mark:hover,
+.hero-brand-mark:focus-visible {
+  border-color: var(--hero-accent);
 }
 
-.hero-masonry {
-  position: absolute;
-  inset: 0;
+.hero-brand-mark:active {
+  transform: scale(0.96);
+}
+
+.hero-brand-mark img {
+  width: 44px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.hero-panel .eyebrow {
+  color: var(--hero-accent);
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 0.9rem;
+}
+
+.hero-panel h1 {
+  color: var(--hero-ink);
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.hero-panel .lede {
+  margin: 0.9rem 0 1.4rem;
+  color: var(--hero-ink-soft);
+  font-size: 0.95rem;
+  max-width: 42ch;
+  margin-inline: auto;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.hero-actions .signup-hint {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--hero-ink-soft);
+  margin-top: 0.15rem;
+}
+
+.hero-actions .signup-hint a,
+.hero-news-label a {
+  color: var(--hero-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(251, 248, 240, 0.45);
+  text-underline-offset: 3px;
+  box-shadow: inset 0 0 0 0 var(--hero-accent);
+  padding: 0 0.25rem;
+  margin: 0 -0.25rem;
+  transition:
+    color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.hero-actions .signup-hint a:hover,
+.hero-news-label a:hover {
+  color: #1b2a21;
+  box-shadow: inset 150px 0 0 0 var(--hero-accent);
+}
+
+.hero-news {
+  margin-top: 1.8rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.hero-news-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--hero-accent);
+  margin: 0 0 1.4rem;
+}
+
+.hero-news-label-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-news-label a {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.hero-news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.hero-news-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hero-news-thumb {
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 6px;
   overflow: hidden;
-  columns: 6 260px;
-  column-gap: 8px;
-  z-index: 0;
-  pointer-events: none;
-  top: 2.2rem;
-  width: 108vw;
-  left: -4vw;
-  height: 108vh;
+  background: var(--hero-panel-bg);
 }
 
-@media (max-width: 768px) {
-  .hero-masonry {
-    columns: 4 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-masonry {
-    columns: 3 90px;
-  }
-}
-
-.hero-masonry img {
+.hero-news-thumb img {
   width: 100%;
-  display: block;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  break-inside: avoid;
+  height: 100%;
+  object-fit: cover;
 }
 
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-bg);
-  opacity: 0.85;
-  z-index: 1;
-  pointer-events: none;
+.hero-news-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--hero-ink);
+}
+
+.hero-news-item:hover .hero-news-title {
+  color: var(--hero-accent);
+}
+
+@media (min-width: 780px) {
+  .hero {
+    height: calc(100vh - var(--header-h));
+    max-height: 860px;
+    min-height: 480px;
+  }
+
+  .hero-tag {
+    display: flex;
+  }
+
+  .hero-scrim {
+    background: linear-gradient(
+      to left,
+      rgba(8, 14, 10, 0.55),
+      rgba(8, 14, 10, 0) 46%
+    );
+  }
+
+  .hero-panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(420px, 40vw);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0 clamp(28px, 4vw, 56px);
+    text-align: left;
+  }
+
+  .hero-panel .lede {
+    max-width: none;
+    margin-inline: 0;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-news-thumb {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding-block: 2.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------- Sobre La Antigua ---------- */
+
+.la-antigua-history h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+}
+
+.la-antigua-history p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  max-width: 62ch;
+}
+
+.la-antigua-history p + p {
+  margin-top: 1rem;
+}
+
+.la-antigua-map {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.la-antigua-map img {
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+@media (min-width: 780px) {
+  .la-antigua-intro .wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 2rem;
+  }
+
+  .la-antigua-map {
+    display: flex;
+    align-items: center;
+    order: -1;
+  }
+}
+
+/* ---------- Información básica ---------- */
+
+.info-strip .wrap {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.info-strip h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.info-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.info-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.45rem 0.8rem;
+}
+
+.info-links a:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
 }
 
 .card {
@@ -424,18 +751,9 @@ body:has(.hero-masonry) footer {
   margin-bottom: 1rem;
 }
 
-.card h1.signed-in {
-  font-size: 1.6rem;
-}
-
 .card h2 {
   margin-top: 2rem;
   margin-bottom: 0.75rem;
-}
-
-.card > .basic-info-links li,
-.card > .news-links li {
-  margin: 0.5rem 0;
 }
 
 .card > p {
