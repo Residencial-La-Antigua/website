@@ -836,6 +836,21 @@ footer .foot-meta a:hover {
   color: var(--color-accent);
 }
 
+footer .foot-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 0.3rem;
+  vertical-align: -3px;
+  color: var(--color-text-muted);
+}
+
+footer .foot-social:hover {
+  color: var(--color-accent);
+}
+
 /* Buttons */
 
 .btn {
