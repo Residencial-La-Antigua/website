@@ -1,22 +1,72 @@
 :root {
-  --color-primary: #2f8f63;
-  --color-primary-dark: #234f3b;
+  --color-primary: #2d6a4f;
+  --color-primary-dark: #204e3a;
+  --color-primary-pale: #eff5e9;
   --color-secondary: #35678a;
-  --color-bg: #faf6ef;
-  --color-surface: #ffffff;
-  --color-text: #2a2a25;
+  --color-accent: #a6552e;
+  --color-bg: #f4efe1;
+  --color-surface: #fffcf5;
+  --color-text: #26332a;
   --color-text-light: #ffffff;
-  --color-text-muted: #5f5b52;
-  --color-border: #e4dfd3;
+  --color-text-muted: #556056;
+  --color-border: #dcd5bc;
+  --color-border-soft: #e7e1cd;
+  --color-btn-ink: #ffffff;
   --color-success-bg: #e6f4ea;
   --color-success-text: #1e5631;
   --color-error-bg: #fbeaea;
   --color-error-text: #ff1818;
 
+  --header-h: 60px;
+
+  /* Fixed regardless of theme: the homepage hero sits over a photo and
+     needs one consistent contrast ratio, not a token that flips. */
+  --hero-ink: #fbf8f0;
+  --hero-ink-soft: rgba(251, 248, 240, 0.82);
+  --hero-accent: #bfead1;
+  --hero-panel-bg: rgba(255, 252, 245, 0.1);
+
   --radius: 10px;
   --shadow: 0 1px 3px rgba(42, 42, 37, 0.08), 0 1px 2px rgba(42, 42, 37, 0.06);
   --font-sans:
-    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    'Work Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+
+  color-scheme: light;
+}
+
+/* Explicit `light` beats the OS preference below; `dark` (system or
+   explicit) is handled in the next block. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-primary: #6fbf95;
+    --color-primary-dark: #4f9e74;
+    --color-primary-pale: #1c3024;
+    --color-accent: #d68e63;
+    --color-bg: #14201a;
+    --color-surface: #1b2a21;
+    --color-text: #f1ecdd;
+    --color-text-muted: #a9b7a9;
+    --color-border: #2c3b31;
+    --color-border-soft: #24322a;
+    --color-btn-ink: #14201a;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-primary: #6fbf95;
+  --color-primary-dark: #4f9e74;
+  --color-primary-pale: #1c3024;
+  --color-accent: #d68e63;
+  --color-bg: #14201a;
+  --color-surface: #1b2a21;
+  --color-text: #f1ecdd;
+  --color-text-muted: #a9b7a9;
+  --color-border: #2c3b31;
+  --color-border-soft: #24322a;
+  --color-btn-ink: #14201a;
+  color-scheme: dark;
 }
 
 body {
@@ -26,51 +76,255 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.5;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  text-wrap: balance;
 }
 
 a {
-  color: var(--color-secondary);
+  color: var(--color-primary-dark);
 }
 
 a:hover {
-  color: var(--color-primary-dark);
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  body {
+    transition: none;
+  }
+}
+
+/* Shared wrapper for chrome and full-width sections */
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-inline: 24px;
 }
 
 /* Header */
 
 .site-header {
+  height: var(--header-h);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
   position: relative;
-  z-index: 5;
+  z-index: 10;
+}
+
+.site-header .wrap {
+  max-width: none;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 1rem 1.5rem;
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  gap: 1rem 1.25rem;
 }
 
 .brand {
-  font-size: 1.4rem;
-  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   text-decoration: none;
-  font-weight: 600;
+  min-width: 0;
 }
 
-.brand:hover {
-  color: var(--color-primary-dark);
+.brand:hover .brand-name {
+  color: var(--color-text);
+}
+
+.brand-mark {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 7px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.brand-mark img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
 }
 
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.4rem;
   flex-wrap: wrap;
+  font-size: 0.95rem;
 }
 
-.site-nav .greeting {
+.site-nav a:not(.btn) {
+  text-decoration: none;
   color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.site-nav a:not(.btn):hover {
+  color: var(--color-accent);
+}
+
+.site-nav .nav-greeting {
+  color: var(--color-text-muted);
+}
+
+.site-nav .nav-logout {
+  display: inline;
+}
+
+.site-nav .nav-logout .btn-link {
+  padding: 0;
+  font-size: inherit;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.site-nav .nav-logout .btn-link:hover {
+  color: var(--color-accent);
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.nav-dropdown-label::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0.6;
+}
+
+.nav-dropdown-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.theme-toggle,
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover,
+.menu-toggle:hover {
+  border-color: var(--color-primary);
+}
+
+.theme-toggle svg,
+.menu-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+/* The full inline nav (and its hover dropdown) only has room from the
+   "large desktop" breakpoint up — below that the hamburger menu is used
+   instead, see the max-width: 1024px block below. */
+@media (min-width: 1025px) {
+  .nav-dropdown-label {
+    cursor: default;
+  }
+
+  .nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.6rem;
+    min-width: 220px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(38, 51, 42, 0.12);
+    padding: 0.4rem;
+    display: none;
+    z-index: 20;
+  }
+
+  /* Bridges the margin-top gap so the cursor can cross from the label
+     into the menu without the hover chain breaking. */
+  .nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -0.6rem;
+    left: 0;
+    right: 0;
+    height: 0.6rem;
+  }
+
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown:focus-within .nav-dropdown-menu {
+    display: block;
+  }
+
+  .nav-dropdown-menu li a {
+    display: block;
+    padding: 0.5rem 0.7rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .nav-dropdown-menu li a:hover {
+    background: var(--color-primary-pale);
+  }
+
+  .site-header .wrap {
+    padding-inline: 48px;
+  }
 }
 
 /* Layout */
@@ -78,69 +332,402 @@ a:hover {
 .container {
   position: relative;
   max-width: 100vw;
-  margin: 6vh auto 1vh;
+  margin: 5vh auto;
 }
 
-/* Decorative masonry background (home page) */
+/* The hero is full-bleed and sits flush against the header; it doesn't
+   want the vertical breathing room other pages' centered cards get. */
+.container:has(> .hero) {
+  margin: 0 auto;
+}
 
-.container:has(.hero-masonry) {
+/* ---------- Hero ---------- */
+
+.accent {
+  font-style: italic;
+  font-weight: 500;
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  margin: 0 0 0.6rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-photo {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% 40%;
+  z-index: 0;
+}
+
+.hero-tag {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem 0.4rem 1.8rem;
+  align-items: center;
+}
+
+.hero-tag::before {
+  content: '';
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(8, 14, 10, 0.5) 0%,
+    rgba(8, 14, 10, 0.22) 55%,
+    rgba(8, 14, 10, 0) 85%
+  );
+  pointer-events: none;
+}
+
+/* In-flow on mobile: the panel's own height is what sizes .hero, so the
+   photo (absolutely filling .hero) ends up exactly as tall as the panel. */
+.hero-panel {
+  position: relative;
+  z-index: 2;
+  width: min(320px, 84vw);
+  background: var(--hero-panel-bg);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 1.5rem 1.5rem 1.75rem;
+  text-align: center;
+}
+
+.hero-brand-mark {
+  appearance: none;
+  font: inherit;
+  margin: 0;
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease;
 }
 
-body:has(.hero-masonry) footer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
+.hero-brand-mark:hover,
+.hero-brand-mark:focus-visible {
+  border-color: var(--hero-accent);
 }
 
-.hero-masonry {
-  position: absolute;
-  inset: 0;
+.hero-brand-mark:active {
+  transform: scale(0.96);
+}
+
+.hero-brand-mark img {
+  width: 44px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.hero-panel .eyebrow {
+  color: var(--hero-accent);
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 0.9rem;
+}
+
+.hero-panel h1 {
+  color: var(--hero-ink);
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.hero-panel .lede {
+  margin: 0.9rem 0 1.4rem;
+  color: var(--hero-ink-soft);
+  font-size: 0.95rem;
+  max-width: 42ch;
+  margin-inline: auto;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.hero-actions .signup-hint {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--hero-ink-soft);
+  margin-top: 0.15rem;
+}
+
+.hero-actions .signup-hint a,
+.hero-news-label a {
+  color: var(--hero-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(251, 248, 240, 0.45);
+  text-underline-offset: 3px;
+  box-shadow: inset 0 0 0 0 var(--hero-accent);
+  padding: 0 0.25rem;
+  margin: 0 -0.25rem;
+  transition:
+    color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.hero-actions .signup-hint a:hover,
+.hero-news-label a:hover {
+  color: #1b2a21;
+  box-shadow: inset 150px 0 0 0 var(--hero-accent);
+}
+
+.hero-news {
+  margin-top: 1.8rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.hero-news-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--hero-accent);
+  margin: 0 0 1.4rem;
+}
+
+.hero-news-label-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-news-label a {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.hero-news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.hero-news-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hero-news-thumb {
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 6px;
   overflow: hidden;
-  columns: 6 260px;
-  column-gap: 8px;
-  z-index: 0;
-  pointer-events: none;
-  top: 2.2rem;
-  width: 108vw;
-  left: -4vw;
-  height: 108vh;
+  background: var(--hero-panel-bg);
 }
 
-@media (max-width: 768px) {
-  .hero-masonry {
-    columns: 4 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-masonry {
-    columns: 3 90px;
-  }
-}
-
-.hero-masonry img {
+.hero-news-thumb img {
   width: 100%;
-  display: block;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  break-inside: avoid;
+  height: 100%;
+  object-fit: cover;
 }
 
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-bg);
-  opacity: 0.85;
-  z-index: 1;
-  pointer-events: none;
+.hero-news-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--hero-ink);
+}
+
+.hero-news-item:hover .hero-news-title {
+  color: var(--hero-accent);
+}
+
+@media (min-width: 780px) {
+  .hero {
+    height: calc(100vh - var(--header-h));
+    max-height: 860px;
+    min-height: 480px;
+  }
+
+  .hero-tag {
+    display: flex;
+  }
+
+  .hero-scrim {
+    background: linear-gradient(
+      to left,
+      rgba(8, 14, 10, 0.55),
+      rgba(8, 14, 10, 0) 46%
+    );
+  }
+
+  .hero-panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(420px, 40vw);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0 clamp(28px, 4vw, 56px);
+    text-align: left;
+  }
+
+  .hero-panel .lede {
+    max-width: none;
+    margin-inline: 0;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-news-thumb {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding-block: 2.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------- Sobre La Antigua ---------- */
+
+.la-antigua-history h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+}
+
+.la-antigua-history p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  max-width: 62ch;
+}
+
+.la-antigua-history p + p {
+  margin-top: 1rem;
+}
+
+.la-antigua-map {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.la-antigua-map img {
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+@media (min-width: 780px) {
+  .la-antigua-intro .wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 2rem;
+  }
+
+  .la-antigua-map {
+    display: flex;
+    align-items: center;
+    order: -1;
+  }
+}
+
+/* ---------- Información básica ---------- */
+
+.info-strip .wrap {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.info-strip h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.info-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.info-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.45rem 0.8rem;
+}
+
+.info-links a:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
 }
 
 .card {
@@ -171,18 +758,9 @@ body:has(.hero-masonry) footer {
   margin-bottom: 1rem;
 }
 
-.card h1.signed-in {
-  font-size: 1.6rem;
-}
-
 .card h2 {
   margin-top: 2rem;
   margin-bottom: 0.75rem;
-}
-
-.card > .basic-info-links li,
-.card > .news-links li {
-  margin: 0.5rem 0;
 }
 
 .card > p {
@@ -190,11 +768,72 @@ body:has(.hero-masonry) footer {
   margin-bottom: 1rem;
 }
 
+/* ---------- Footer ---------- */
+
 footer {
-  text-align: center;
+  border-top: 1px solid var(--color-border);
+  padding-block: 2rem;
+}
+
+footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
-  padding: 2rem 1.5rem;
+}
+
+footer .foot-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+footer .foot-mark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+footer .foot-mark img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+footer .foot-brand {
+  font-family: var(--font-serif);
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+footer .foot-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  text-align: right;
+}
+
+footer .foot-meta a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 2px;
+}
+
+footer .foot-meta a:hover {
+  color: var(--color-accent);
 }
 
 /* Buttons */
@@ -210,13 +849,27 @@ footer {
   cursor: pointer;
   text-decoration: none;
   background-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-btn-ink);
   transition: background-color 0.15s ease;
 }
 
 .btn:hover {
   background-color: var(--color-primary-dark);
-  color: #fff;
+  color: var(--color-btn-ink);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.3rem;
+  font-size: 0.95rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-primary);
+}
+
+.btn-primary:hover {
+  border-color: var(--color-primary-dark);
 }
 
 .btn-link {
@@ -306,4 +959,122 @@ form .helptext {
 .messages li.error {
   background-color: var(--color-error-bg);
   color: var(--color-error-text);
+}
+
+/* ---------- Responsive ---------- */
+
+/* min-width: 780px and max-width: 780px both fire at exactly 780px —
+   inherited from the mockup, not something to "fix" here; the redesign's
+   desktop rules above and the mobile rules below intentionally overlap
+   at that boundary. */
+@media (max-width: 780px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .hero-photo {
+    position: static;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-scrim {
+    display: none;
+  }
+
+  .hero-panel {
+    width: 100%;
+    background: #1b2a21;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 2rem 24px 2.25rem;
+  }
+
+  .hero-news-title {
+    text-align: left;
+  }
+
+  .hero-news-thumb {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* The inline nav's links don't fit at 780px, so the hamburger menu is
+   kept all the way up to the "large desktop" breakpoint (1025px), not
+   just the mobile/tablet 780px breakpoint used for the hero layout. */
+@media (max-width: 1024px) {
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.9rem 24px 1.25rem;
+  }
+
+  .site-nav.is-open {
+    display: flex;
+  }
+
+  .site-nav a:not(.btn) {
+    padding: 0.5rem 0.1rem;
+  }
+
+  .site-nav .btn {
+    width: 100%;
+    margin-top: 0.2rem;
+  }
+
+  .nav-dropdown-label {
+    pointer-events: none;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .nav-dropdown-label::after {
+    display: none;
+  }
+
+  .nav-dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0.9rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .info-strip .wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  footer .foot-right {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }

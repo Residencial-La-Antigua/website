@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{% static 'css/reset.css' %}" />
@@ -17,22 +17,53 @@
   </head>
   <body>
     <header class="site-header">
-      <a href="{% url 'home' %}" class="brand">Residencial La Antigua 🌿</a>
-      <nav class="site-nav">
-        {% if user.is_authenticated %}
-        <span class="greeting">Hola, {{ user.username }}</span>
-        <a href="{% url 'noticias' %}">Noticias</a>
-        <a href="{% url 'calendario' %}">Calendario</a>
-        <a href="{% url 'profile' %}">Mi cuenta</a>
-        <form method="post" action="{% url 'logout' %}" style="display: inline">
-          {% csrf_token %}
-          <button type="submit" class="btn-link">Cerrar sesión</button>
-        </form>
-        {% else %}
-        <a href="{% url 'login' %}">Iniciar sesión</a>
-        <a href="{% url 'signup' %}" class="btn">Registrarse</a>
-        {% endif %}
-      </nav>
+      <div class="wrap">
+        <a href="{% url 'home' %}" class="brand">
+          <span class="brand-mark"><img src="{% static 'images/logo-icon.png' %}" alt="" /></span>
+          <span class="brand-name">Residencial La Antigua</span>
+        </a>
+        <div class="header-controls">
+          <nav class="site-nav" id="site-nav">
+            {% if user.is_authenticated %}
+            <a href="{% url 'noticias' %}">Noticias</a>
+            <a href="{% url 'calendario' %}">Calendario</a>
+            <div class="nav-dropdown">
+              <span class="nav-dropdown-label" tabindex="0">Servicios Públicos</span>
+              <ul class="nav-dropdown-menu">
+                <li><a href="{% url 'telefonos-importantes' %}">Teléfonos importantes</a></li>
+                <li><a href="{% url 'basura-y-reciclaje' %}">Basura y reciclaje</a></li>
+                <li><a href="{% url 'desechos-no-tradicionales' %}">Desechos no tradicionales</a></li>
+              </ul>
+            </div>
+            <a href="{% url 'profile' %}">Mi cuenta</a>
+            <form method="post" action="{% url 'logout' %}" class="nav-logout">
+              {% csrf_token %}
+              <button type="submit" class="btn-link">Cerrar sesión</button>
+            </form>
+            {% else %}
+            <a href="{% url 'noticias' %}">Noticias</a>
+            <div class="nav-dropdown">
+              <span class="nav-dropdown-label" tabindex="0">Servicios Públicos</span>
+              <ul class="nav-dropdown-menu">
+                <li><a href="{% url 'telefonos-importantes' %}">Teléfonos importantes</a></li>
+                <li><a href="{% url 'basura-y-reciclaje' %}">Basura y reciclaje</a></li>
+                <li><a href="{% url 'desechos-no-tradicionales' %}">Desechos no tradicionales</a></li>
+              </ul>
+            </div>
+            <a href="{% url 'login' %}">Iniciar sesión</a>
+            <a href="{% url 'signup' %}">Registrarme</a>
+            {% endif %}
+          </nav>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar a tema oscuro">
+            <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+            <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="display: none"><path d="M20 14.5A8.5 8.5 0 1110 3.2a6.8 6.8 0 0010 11.3z"/></svg>
+          </button>
+          <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="site-nav">
+            <svg id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"/></svg>
+            <svg id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="display: none"><path d="M5 5l14 14M19 5L5 19"/></svg>
+          </button>
+        </div>
+      </div>
     </header>
 
     <main class="container">
@@ -46,8 +77,82 @@
     </main>
 
     <footer>
-      Desarrollado con ❤️ por y para los residentes de Residencial La Antigua 🌿
+      <div class="wrap">
+        <div class="foot-left">
+          <span class="foot-copy">© {% now "Y" %}</span>
+          <span class="foot-mark"><img src="{% static 'images/logo-icon.png' %}" alt="" /></span>
+          <span class="foot-brand">Residencial La Antigua</span>
+          <span>— Tres Ríos, La Unión, Cartago, Costa Rica</span>
+        </div>
+        <div class="foot-right">
+          <span>Desarrollado con ❤️ por y para los vecinos del barrio.</span>
+          <span class="foot-meta">
+            Comuníquese con nosotros:
+            <a href="mailto:arbolesdelaantigua@gmail.com">arbolesdelaantigua@gmail.com</a>
+          </span>
+        </div>
+      </div>
     </footer>
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var KEY = 'la-antigua-theme';
+        var stored = null;
+        try { stored = localStorage.getItem(KEY); } catch (e) {}
+        if (stored === 'light' || stored === 'dark') root.setAttribute('data-theme', stored);
+
+        function effectiveTheme() {
+          var explicit = root.getAttribute('data-theme');
+          if (explicit === 'light' || explicit === 'dark') return explicit;
+          return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+
+        function sync() {
+          var dark = effectiveTheme() === 'dark';
+          var btn = document.getElementById('theme-toggle');
+          var sun = document.getElementById('icon-sun');
+          var moon = document.getElementById('icon-moon');
+          if (!btn || !sun || !moon) return;
+          sun.style.display = dark ? 'none' : 'block';
+          moon.style.display = dark ? 'block' : 'none';
+          btn.setAttribute('aria-label', dark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+        }
+
+        sync();
+
+        var toggle = document.getElementById('theme-toggle');
+        if (toggle) {
+          toggle.addEventListener('click', function () {
+            var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            try { localStorage.setItem(KEY, next); } catch (e) {}
+            sync();
+          });
+        }
+
+        var menuToggle = document.getElementById('menu-toggle');
+        var siteNav = document.getElementById('site-nav');
+        var iconMenu = document.getElementById('icon-menu');
+        var iconClose = document.getElementById('icon-close');
+
+        function setMenu(open) {
+          siteNav.classList.toggle('is-open', open);
+          menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+          iconMenu.style.display = open ? 'none' : 'block';
+          iconClose.style.display = open ? 'block' : 'none';
+        }
+
+        if (menuToggle && siteNav) {
+          menuToggle.addEventListener('click', function () {
+            setMenu(!siteNav.classList.contains('is-open'));
+          });
+          siteNav.addEventListener('click', function (e) {
+            if (e.target.tagName === 'A') setMenu(false);
+          });
+        }
+      })();
+    </script>
     {% block extra_js %}{% endblock %}
     {% include "_umami.html" %}
   </body>

@@ -1,50 +1,129 @@
 {% extends "base.html" %} {% load static %} {% block content %}
-<div class="hero-masonry" aria-hidden="true">
-  <img src="{% static 'images/tiles/tile-01.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-02.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-03.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-04.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-05.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-06.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-07.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-08.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-09.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-10.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-11.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-12.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-13.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-14.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-15.jpg' %}" alt="" />
-  <img src="{% static 'images/tiles/tile-16.jpg' %}" alt="" />
-</div>
-<div class="hero-overlay"></div>
+<div class="hero">
+  <img
+    class="hero-photo"
+    src="{% static 'images/hero-dia-del-arbol.webp' %}"
+    alt="Vecinos de todas las edades reunidos en la calle durante la siembra del Día del Árbol, con palas listas sobre el zacate."
+  />
+  <span class="hero-tag">Día del Árbol · junio 2026</span>
+  <div class="hero-scrim" aria-hidden="true"></div>
 
-<div class="card">
-  {% if user.is_authenticated %}
-  <h1 class="signed-in">Bienvenido, {{ user.first_name }}</h1>
-  <p>
-    Este es el punto de partida de la plataforma comunitaria de Residencial La
-    Antigua.
-  </p>
-  {% else %}
-  <h1>¡Bienvenido! 👋</h1>
-  <p>
-    Únete a la plataforma comunitaria de Residencial La Antigua y participa en
-    los eventos y actividades del barrio.
-  </p>
-  <a href="{% url 'signup' %}" class="btn">Registrarse</a>
-  <h2>Noticias</h2>
-  <ul class="news-links">
-    <li>📰 &nbsp;<a href="{% url 'noticias-detalle' 'primera-reunion-de-cuadrilla' %}">Cuadrilleros celebran fin de temporada</a></li>
-    <li>📰 &nbsp;<a href="{% url 'noticias-detalle' 'siembra-con-aldeas-infantiles-sos' %}">Siembra con aldeas infantiles SOS</a></li>
-    <li>📰 &nbsp;<a href="{% url 'noticias-detalle' 'dia-del-arbol' %}">Celebración del Día del Árbol</a></li>
-  </ul>
-  <h2>Información Básica</h2>
-  <ul class="basic-info-links">
-    <li>☎️ &nbsp;<a href="{% url 'telefonos-importantes' %}">Teléfonos importantes</a></li>
-    <li>♻️ &nbsp;<a href="{% url 'basura-y-reciclaje' %}">Recolección de basura y reciclaje</a></li>
-    <li>🛋️ &nbsp;<a href="{% url 'desechos-no-tradicionales' %}">Desechos no tradicionales</a></li>
-  </ul>
-  {% endif %}
+  <div class="hero-panel">
+    <div class="hero-signin">
+      <p class="eyebrow">Residencial La Antigua</p>
+      {% if user.is_authenticated %}
+      <h1>Bienvenido, <span class="accent">{{ user.first_name|default:user.username }}</span></h1>
+      <p class="lede">
+        Este es el punto de partida de la plataforma comunitaria de
+        Residencial La Antigua.
+      </p>
+      {% else %}
+      <h1>Vecinos hoy, <span class="accent">comunidad</span> siempre.</h1>
+      <p class="lede">
+        Iniciá sesión para enterarte, emprender y participar en las
+        actividades del barrio.
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'login' %}" class="btn btn-primary btn-block">Iniciar sesión</a>
+        <span class="signup-hint">¿Aún no tenés cuenta? <a href="{% url 'signup' %}">Registrarme</a></span>
+      </div>
+      {% endif %}
+    </div>
+    <div class="hero-news">
+      <p class="hero-news-label">
+        <span class="hero-news-label-text">
+          <button
+            type="button"
+            class="hero-brand-mark"
+            id="jingle-btn"
+            aria-label="Reproducir jingle de Árboles de La Antigua"
+          >
+            <img src="{% static 'images/logo-arboles.png' %}" alt="" />
+          </button>
+          Noticias
+        </span>
+        <a href="{% url 'noticias' %}">Ver todas →</a>
+      </p>
+      <audio id="jingle-audio" src="{% static 'audio/jingle.mp3' %}" preload="none"></audio>
+      <div class="hero-news-list">
+        {% for article in latest_articles %}
+        <a class="hero-news-item" href="{% url 'noticias-detalle' article.slug %}">
+          <span class="hero-news-thumb">
+            {% if article.image %}
+            <img src="{% static article.image %}" alt="" />
+            {% endif %}
+          </span>
+          <span class="hero-news-title">{{ article.title }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="la-antigua-intro">
+  <div class="wrap">
+    <section class="section la-antigua-history">
+      <h2>Residencial La Antigua</h2>
+      <p>
+        Residencial La Antigua es una comunidad ubicada en Tres Ríos, La
+        Unión, Cartago. Delimitada por los ríos Tiribí y Chiquito, la línea
+        férrea y la Calle Vieja, reúne alrededor de sus calles y áreas verdes
+        a vecinos que comparten no solo un lugar donde vivir, sino también un
+        entorno que cuidar. Sus árboles, jardines, ríos y espacios comunes
+        forman parte de la identidad de un residencial consolidado a lo largo
+        de los años.
+      </p>
+      <p>
+        Hoy La Antigua busca fortalecer esa identidad mediante una
+        participación vecinal cada vez más activa. Iniciativas como Árboles
+        de La Antigua, La Cuadrilla y el Grupo Tech han surgido del trabajo
+        de los propios vecinos para cuidar y mejorar el residencial. En
+        colaboración con la Municipalidad de La Unión, se siembran y
+        mantienen árboles y arbustos, se organizan actividades comunitarias
+        y se desarrollan nuevas herramientas para facilitar la comunicación,
+        la organización y la participación.
+      </p>
+      <p>
+        Esta plataforma forma parte de ese esfuerzo. Además de reunir
+        información y servicios útiles para la vida cotidiana, busca
+        ayudarnos a conocernos, organizarnos y cuidar mejor el lugar que
+        compartimos. Porque La Antigua es más que un conjunto de casas y
+        calles: es una comunidad que se construye entre todos, con las
+        personas, los árboles y el entorno que nos acompañan hoy y que
+        dejaremos a quienes vengan mañana.
+      </p>
+    </section>
+    <section class="section la-antigua-map">
+      <img
+        src="{% static 'images/map-la-antigua.webp' %}"
+        alt="Mapa de Residencial La Antigua: calles Jade, Zafiro, Esmeralda, Amatista y Rubí, entradas principales por Calle Rubí y Calle Amatista, ríos Tiribí y Chiquito, y acceso desde la Calle Vieja (ruta nacional 251)."
+      />
+    </section>
+  </div>
+</div>
+
+<section class="section info-strip">
+  <div class="wrap">
+    <h2>Información básica sobre servicios públicos</h2>
+    <ul class="info-links">
+      <li><a href="{% url 'telefonos-importantes' %}">☎️ Teléfonos importantes</a></li>
+      <li><a href="{% url 'basura-y-reciclaje' %}">♻️ Basura y reciclaje</a></li>
+      <li><a href="{% url 'desechos-no-tradicionales' %}">🛋️ Desechos no tradicionales</a></li>
+    </ul>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
+<script>
+  (function () {
+    var jingleBtn = document.getElementById('jingle-btn');
+    var jingleAudio = document.getElementById('jingle-audio');
+    if (jingleBtn && jingleAudio) {
+      jingleBtn.addEventListener('click', function () {
+        jingleAudio.currentTime = 0;
+        jingleAudio.play();
+      });
+    }
+  })();
+</script>
 {% endblock %}

@@ -2,14 +2,14 @@
 
 .noticias-page,
 .noticia-page {
-  max-width: 760px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2rem;
 }
 
 .noticias-page h1,
 .noticia-page h1 {
-  margin: 0 0 2rem;
+  margin: 0 0 1.5rem;
   font-weight: 600;
   font-size: 1.8rem;
 }
