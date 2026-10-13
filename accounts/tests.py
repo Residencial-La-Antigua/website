@@ -78,21 +78,20 @@ class AnalyticsIdFilterTests(TestCase):
 
 
 class SignupViewTests(TestCase):
-    def _post_signup(self, username="nuevo_residente"):
-        return self.client.post(
-            reverse("signup"),
-            {
-                "username": username,
-                "email": "",
-                "first_name": "Nuevo",
-                "last_name": "Residente",
-                "street": "Calle Principal",
-                "house_number": "2",
-                "phone_number": "",
-                "password1": "clave-segura-123",
-                "password2": "clave-segura-123",
-            },
-        )
+    def _post_signup(self, username="nuevo_residente", **overrides):
+        data = {
+            "username": username,
+            "email": "",
+            "first_name": "Nuevo",
+            "last_name": "Residente",
+            "street": "Calle Principal",
+            "house_number": "2",
+            "phone_number": "",
+            "password1": "clave-segura-123",
+            "password2": "clave-segura-123",
+        }
+        data.update(overrides)
+        return self.client.post(reverse("signup"), data)
 
     def test_emails_active_staff_with_an_email_address(self):
         create_user(
@@ -151,6 +150,30 @@ class SignupViewTests(TestCase):
         self.assertEqual(
             sorted(mail.outbox[0].to),
             ["admin1@example.com", "admin2@example.com"],
+        )
+
+    def test_collapses_embedded_newlines_in_the_registrants_name(self):
+        create_user(
+            "admin1", is_staff=True, is_active=True, email="admin1@example.com"
+        )
+
+        self._post_signup(last_name="Residente\n\nMENSAJE FALSO")
+
+        body = mail.outbox[0].body
+        self.assertIn("Residente MENSAJE FALSO", body)
+        self.assertNotIn("\n\nMENSAJE FALSO", body)
+
+    def test_instruction_precedes_the_registrants_unverified_name(self):
+        create_user(
+            "admin1", is_staff=True, is_active=True, email="admin1@example.com"
+        )
+
+        self._post_signup()
+
+        body = mail.outbox[0].body
+        self.assertLess(
+            body.index("/admin/accounts/user/"),
+            body.index("Nombre proporcionado"),
         )
 
 
