@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from .forms import ProfileForm, SignupForm
+from .notifications import notify_staff_of_new_signup
 
 
 class SignupView(CreateView):
@@ -14,6 +15,7 @@ class SignupView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        notify_staff_of_new_signup(self.object) # type: ignore[attr-defined] 
         messages.success(
             self.request,
             "Cuenta creada. Un administrador debe aprobarla antes de que puedas iniciar sesión.",
