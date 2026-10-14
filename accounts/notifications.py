@@ -32,12 +32,12 @@ def notify_staff_of_new_signup(user):
     full_name = _collapse_whitespace(f"{user.first_name} {user.last_name}")
     username = _collapse_whitespace(user.username)
 
-    subject = "Nueva cuenta pendiente de aprobación"
+    subject = "La Antigua - Aprobar cuenta nueva"
     # The registrant's own name is untrusted, unreviewed free text, so it's
     # quoted and placed last; never ahead of, or blended into, the
     # instruction, so it can't be mistaken for a system-authored message.
     body = (
-        "Una cuenta nueva está pendiente de aprobación. "
+        "Una cuenta nueva está pendiente de aprobación.\n"
         "Apruébala desde /admin/accounts/user/.\n\n"
         f'Nombre proporcionado por el usuario: "{full_name}" '
         f'(usuario: "{username}")'
