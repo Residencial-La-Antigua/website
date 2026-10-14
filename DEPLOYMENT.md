@@ -14,6 +14,14 @@ DATABASE_URL="postgres://usuario:contraseña@host:5432/nombre_db"
 ANALYTICS_SALT="<clave larga y aleatoria, distinta de SECRET_KEY>"
 ```
 
+## Correo
+
+Cuando alguien se registra, [accounts/notifications.py](accounts/notifications.py) le avisa por correo a cada usuario con `is_staff=True` y `is_active=True` (que tenga un correo definido) que hay una cuenta nueva pendiente de aprobación.
+
+Para esta funcionalidad, se definen las variables de entorno: `EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` y `DEFAULT_FROM_EMAIL`, todas ellas son opcionales. Sin ellas, el correo se imprime en la consola en vez de enviarse de verdad.
+
+`docker-compose.prod.yml` fija `EMAIL_BACKEND` al backend SMTP (no al de consola) ya que ahí sí se espera correo real. Si `EMAIL_HOST` queda vacío, el envío simplemente falla y queda registrado en el log vía `logger.exception` sin afectar el registro de la nueva cuenta ni el funcionamiento del contenedor.
+
 ## Zona horaria del calendario
 
 `config/settings.py` usa `TIME_ZONE = "UTC"` para toda la aplicación, pero la comunidad de residentes vive físicamente en una sola zona horaria real. `RESIDENT_TZ` en [calendario/timezones.py](calendario/timezones.py) es esa zona horaria: se usa para convertir la hora que un residente escribe en el formulario del calendario a UTC antes de guardarla, y de vuelta a la hora local al mostrarla en el calendario.
@@ -72,4 +80,4 @@ Render construye la imagen directamente desde el [Dockerfile](Dockerfile) i.e. n
 
 - **Language**: Docker
 - **Docker Command** (en Advanced): `sh scripts/start-prod.sh`
-- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, `ANALYTICS_SALT`, `ALLOWED_HOSTS` — esta última hay que agregarla _después_ de crear el servicio (en caso de utilizar una solución de hosting como Render pues se debe saber cuál es el dominio). Sin `ALLOWED_HOSTS` todas las peticiones se rechazan con `DisallowedHost`.
+- **Variables de entorno**: `SECRET_KEY`, `DEBUG=False`, `DATABASE_URL`, `ANALYTICS_SALT`, `ALLOWED_HOSTS` — esta última hay que agregarla _después_ de crear el servicio (en caso de utilizar una solución de hosting como Render pues se debe saber cuál es el dominio). Sin `ALLOWED_HOSTS` todas las peticiones se rechazan con `DisallowedHost`. Opcionalmente, las variables para el envío de notificaciones (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`) necesitan definirse si se quiere enviar correo en vez de solo loguearlo en la consola.

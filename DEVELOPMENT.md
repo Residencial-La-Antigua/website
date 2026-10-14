@@ -21,7 +21,7 @@ uv run manage.py migrate
 
 ## Autenticación
 
-Las cuentas de vecinos se registran en `/accounts/signup/` pero quedan inactivas (`is_active=False`) hasta que un administrador las aprueba desde `/admin/` (acción "Aprobar cuentas seleccionadas" sobre el modelo Usuario).
+Las cuentas de vecinos se registran en `/accounts/signup/` pero quedan inactivas (`is_active=False`) hasta que un administrador las aprueba desde `/admin/` (acción "Aprobar cuentas seleccionadas" sobre el modelo Usuario). Al registrarse, cada usuario con `is_staff=True` recibe un correo avisando que hay una cuenta pendiente; en desarrollo local este correo solo se imprime en la consola.
 
 Para crear un administrador local:
 
@@ -80,6 +80,6 @@ Para no contaminar las estadísticas durante el desarrollo o pruebas locales, ha
 ### Para ambiente de producción
 
 - [ ] Configurar `LOGGING` para producción — hoy no hay nada configurado más allá del comportamiento por defecto de Django (stdout/stderr, capturado por `docker compose logs`, sin niveles ni estructura).
-- [ ] Configurar `ADMINS`, `MANAGERS` y `EMAIL_BACKEND` — sin esto nadie recibe aviso por correo ante un error 500, y no hay de dónde enviar correos si en el futuro se agrega algo como recuperación de contraseña.
+- [ ] Configurar `ADMINS` y `MANAGERS` — sin esto nadie recibe aviso por correo ante un error 500. `EMAIL_BACKEND` y el resto de configuración SMTP ya están listos: hoy se usan para avisarle a los usuarios con `is_staff=True` de cuentas nuevas pendientes de aprobación (`accounts/notifications.py`).
 - [ ] Agregar plantillas de error personalizadas (`404.html`, `500.html`, `403.html`, `400.html` en la raíz de `templates/`) — hoy Django sirve sus páginas de error genéricas, sin el diseño del sitio.
 - [ ] Configurar `CACHES` — no está definido, así que cada proceso de Gunicorn usa su propio cache en memoria local (inconsistente entre workers). Baja prioridad mientras no se use el framework de cache de Django en ninguna vista.
