@@ -1,18 +1,20 @@
 {% extends "base.html" %} {% block title %}Mi cuenta{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Mi cuenta</h1>
-  <form method="post" action="{% url 'profile' %}">
-    {% csrf_token %} {{ form.as_p }}
-    <button type="submit" class="btn">Guardar cambios</button>
-  </form>
-</div>
-<div class="card">
-  <h1>Cambio de Clave</h1>
-  <form method="post" action="{% url 'password_change' %}">
-    {% csrf_token %} {{ password_form.as_p }}
-    <button type="submit" class="btn">Actualizar clave</button>
-  </form>
+<div class="profile-cards">
+  <div class="card">
+    <h1>Mi Cuenta</h1>
+    <form method="post" action="{% url 'profile' %}">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit" class="btn">Guardar cambios</button>
+    </form>
+  </div>
+  <div class="card">
+    <h1>Cambio de Clave</h1>
+    <form method="post" action="{% url 'password_change' %}">
+      {% csrf_token %} {{ password_form.as_p }}
+      <button type="submit" class="btn">Actualizar clave</button>
+    </form>
+  </div>
 </div>
 {% endblock %}
 {% block extra_js %}
