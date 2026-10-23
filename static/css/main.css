@@ -742,6 +742,10 @@ a:hover {
   margin: 0 auto;
 }
 
+.card + .card {
+  margin-top: 1.5rem;
+}
+
 .card.signup ul {
   list-style: disc;
   padding-left: 1.25rem;
