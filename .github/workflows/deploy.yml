@@ -34,12 +34,16 @@ jobs:
           ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ANALYTICS_SALT: ${{ secrets.ANALYTICS_SALT }}
+          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+          DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
         run: |
           {
             echo "SECRET_KEY=$SECRET_KEY"
             echo "ALLOWED_HOSTS=$ALLOWED_HOSTS"
             echo "DATABASE_URL=$DATABASE_URL"
             echo "ANALYTICS_SALT=$ANALYTICS_SALT"
+            echo "EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD"
+            echo "DEFAULT_FROM_EMAIL=$DEFAULT_FROM_EMAIL"
           } > .env
 
       - name: Build image

@@ -37,6 +37,20 @@ ANALYTICS_SALT = os.environ.get(
     "ANALYTICS_SALT", "insecure-dev-only-analytics-salt"
 )
 
+# Email (used to notify staff of new signups pending approval
+# Sent via Resend's SMTP relay in production (https://resend.com/docs/send-with-smtp)
+# EMAIL_HOST_PASSWORD is the Resend API key, EMAIL_HOST_USER is literally "resend". 
+# In local dev, emails print to the console instead of actually sending; no setup needed.
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.resend.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "resend")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "webmaster@localhost")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 

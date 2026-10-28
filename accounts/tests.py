@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -25,7 +26,7 @@ _STORAGES_WITHOUT_MANIFEST = {
 }
 
 
-def create_user(username, is_active=True, is_staff=False):
+def create_user(username, is_active=True, is_staff=False, email=""):
     return User.objects.create_user(
         username=username,
         password="clave-segura-123",
@@ -33,6 +34,7 @@ def create_user(username, is_active=True, is_staff=False):
         house_number="1",
         is_active=is_active,
         is_staff=is_staff,
+        email=email,
     )
 
 
@@ -73,6 +75,106 @@ class AnalyticsIdFilterTests(TestCase):
         with override_settings(ANALYTICS_SALT="una-sal-completamente-distinta"):
             after = analytics_id(user)
         self.assertNotEqual(before, after)
+
+
+class SignupViewTests(TestCase):
+    def _post_signup(self, username="nuevo_residente", **overrides):
+        data = {
+            "username": username,
+            "email": "",
+            "first_name": "Nuevo",
+            "last_name": "Residente",
+            "street": "Calle Principal",
+            "house_number": "2",
+            "phone_number": "",
+            "password1": "clave-segura-123",
+            "password2": "clave-segura-123",
+        }
+        data.update(overrides)
+        return self.client.post(reverse("signup"), data)
+
+    def test_emails_active_staff_with_an_email_address(self):
+        create_user(
+            "admin1", is_staff=True, is_active=True, email="admin1@example.com"
+        )
+
+        self._post_signup()
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["admin1@example.com"])
+
+    def test_does_not_email_inactive_staff(self):
+        create_user(
+            "admin_inactivo",
+            is_staff=True,
+            is_active=False,
+            email="inactivo@example.com",
+        )
+
+        self._post_signup()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_does_not_email_non_staff_users(self):
+        create_user("residente_normal", email="residente@example.com")
+
+        self._post_signup()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_skips_staff_with_no_email_address(self):
+        create_user("admin_sin_correo", is_staff=True, is_active=True, email="")
+
+        self._post_signup()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_signup_succeeds_even_with_no_staff_to_notify(self):
+        response = self._post_signup()
+
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("login"))
+
+    def test_emails_all_active_staff_in_a_single_message(self):
+        create_user(
+            "admin1", is_staff=True, is_active=True, email="admin1@example.com"
+        )
+        create_user(
+            "admin2", is_staff=True, is_active=True, email="admin2@example.com"
+        )
+
+        self._post_signup()
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            sorted(mail.outbox[0].to),
+            ["admin1@example.com", "admin2@example.com"],
+        )
+
+    def test_collapses_embedded_newlines_in_the_registrants_name(self):
+        create_user(
+            "admin1", is_staff=True, is_active=True, email="admin1@example.com"
+        )
+
+        self._post_signup(last_name="Residente\n\nMENSAJE FALSO")
+
+        body = mail.outbox[0].body
+        self.assertIn("Residente MENSAJE FALSO", body)
+        self.assertNotIn("\n\nMENSAJE FALSO", body)
+
+    def test_instruction_precedes_the_registrants_unverified_name(self):
+        create_user(
+            "admin1", is_staff=True, is_active=True, email="admin1@example.com"
+        )
+
+        self._post_signup()
+
+        body = mail.outbox[0].body
+        self.assertLess(
+            body.index("/admin/accounts/user/"),
+            body.index("Nombre proporcionado"),
+        )
 
 
 @override_settings(STORAGES=_STORAGES_WITHOUT_MANIFEST)
