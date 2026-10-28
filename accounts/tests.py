@@ -29,7 +29,7 @@ def create_user(username, is_active=True, is_staff=False):
     return User.objects.create_user(
         username=username,
         password="clave-segura-123",
-        street="Calle Principal",
+        street="Jade",
         house_number="1",
         is_active=is_active,
         is_staff=is_staff,
@@ -41,7 +41,7 @@ def create_superuser(username):
         username=username,
         email=f"{username}@example.com",
         password="clave-segura-123",
-        street="Calle Principal",
+        street="Jade",
         house_number="1",
     )
 

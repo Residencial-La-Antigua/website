@@ -16,11 +16,21 @@ class UserManager(DjangoUserManager):
 class User(AbstractUser):
     """Neighbor account. Inactive by default until an admin approves it."""
 
+    STREET_CHOICES = (
+        ("", "Selecciona tu calle"),
+        ("Amatista", "Amatista"),
+        ("Esmeralda", "Esmeralda"),
+        ("Jade", "Jade"),
+        ("Rubí", "Rubí"),
+        ("Topacio", "Topacio"),
+        ("Zafiro", "Zafiro"),
+    )
+
     is_active = models.BooleanField(
         default=False,
         help_text="Unapproved neighbor accounts stay inactive and cannot log in.",
     )
-    street = models.CharField("calle", max_length=200)
+    street = models.CharField("calle", max_length=20, choices=STREET_CHOICES)
     house_number = models.CharField(
         "número de casa (+ apartamento, si aplica)", max_length=20
     )
