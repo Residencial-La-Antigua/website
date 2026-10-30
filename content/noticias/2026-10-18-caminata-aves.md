@@ -8,13 +8,13 @@ _Los participantes posan para marcar este momento histórico en el Residencial._
 
 **18 de octubre de 2026.** Nueve vecinos participaron en la primera caminata de observación de aves organizada por Árboles de La Antigua, bajo la guía del vecino Jeffrey Otico. Durante un recorrido de dos horas y media por las calles y áreas verdes del residencial, entre las 7:00 y las 9:30 de la mañana, el grupo logró identificar 27 especies de aves, tanto por su apariencia como por sus cantos. La mañana soleada y despejada ofreció condiciones ideales para caminar tranquilamente, observar la naturaleza y descubrir la diversidad de aves que habitan en nuestro propio barrio.
 
-![El anuncio para promocionar el evento](images/noticias/caminata-aves/02.webp)
+![El anuncio para promocionar el evento](images/noticias/caminata-aves/02.webp){: .noticia-img--center }
 
 _El anuncio para promocionar el evento. La hora de partida real era a las 7 am._
 
 Entre las especies identificadas se encontraron pájaros carpinteros, tangaras, gorriones, mosqueros, palomas, halcones y reinitas. Uno de los momentos más emocionantes ocurrió hacia el final del recorrido, cuando dos espectaculares caracaras cargahuesos sobrevolaron al grupo, sorprendiendo a los participantes. Después de la actividad, se compartió con los participantes una lista ilustrada de las 27 especies identificadas. Este primer registro servirá como punto de partida para documentar la avifauna del residencial y comparar las observaciones de futuras caminatas. Los interesados pueden consultar la lista completa de especies al final de esta nota.
 
-![Dos caracaras como esta sobrevolaron sorprendiendo a los observadores de aves](images/noticias/caminata-aves/03.webp)
+![Dos caracaras como esta sobrevolaron sorprendiendo a los observadores de aves](images/noticias/caminata-aves/03.webp){: .noticia-img--center }
 
 _La foto de la caracara es ilustrativa y no corresponde a los individuos observados durante la caminata._
 
