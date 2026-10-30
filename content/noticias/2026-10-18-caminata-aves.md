@@ -1,6 +1,6 @@
 ---
 title: 'Vecinos de La Antigua descubren 27 especies de aves durante su primera caminata de observación'
-summary: 'Nueve vecinos identificaron 27 especies de aves en la primera caminata de observación organizada por Árboles de La Antigua, guiada por el vecino Jeffrey Otico.'
+summary: 'Nueve vecinos identificaron 27 especies de aves diferentes en la primera caminata de observación organizada por Árboles de La Antigua, guiada por el vecino Jeffrey Otico.'
 image: images/noticias/caminata-aves/01.webp
 ---
 
@@ -24,35 +24,34 @@ Costa Rica alberga una extraordinaria diversidad de aves, muchas de las cuales t
 
 ### Especies de aves identificadas durante la caminata
 
-_18 de octubre de 2026 | 7:00–9:30 a. m. | Guía: Jeffrey Otico | 27 especies identificadas_
+_18 de octubre de 2026 | 7:00–9:30 a. m. | Guía: Jeffrey Otico | 27 especies observadas_
 
-| Español | Científico | Inglés |
-| --- | --- | --- |
-| Bienteveo Grande | *Pitangus sulphuratus* | Great Kiskadee |
-| Cacique veranero | *Icterus galbula* | Baltimore Oriole |
-| Caracara Cargahuesos | *Caracara cheriway* | Crested Caracara |
-| Carpintero de Hoffman | *Melanerpes hoffmannii* | Hoffmann's Woodpecker |
-| Colibrí Rabirrufo | *Amazilia tzacatl* | Rufous-tailed Hummingbird |
-| Comemaíz | *Zonotrichia capensis* | Rufous-collared Sparrow |
-| Espatulilla Común | *Todirostrum cinereum* | Common Tody-Flycatcher |
-| Gavilán Aludo? | *Buteo platypterus* | Broad-winged Hawk |
-| Gavilán Chapulinero? | *Rupornis magnirostris* | Roadside Hawk |
-| Gavilán Gris | *Buteo plagiatus* | Gray Hawk |
-| Mosquero Cejiblanco | *Myiozetetes similis* | Social Flycatcher |
-| Pájaro-imitador Tropical | *Mimus gilvus* | Tropical Mockingbird |
-| Paloma Aliblanca | *Zenaida asiatica* | White-winged Dove |
-| Paloma Piquirroja | *Patagioenas flavirostris* | Red-billed Pigeon |
-| Perico Frentirrojo | *Psittacara finschi* | Crimson-fronted Parakeet |
-| Piapia | *Psilorhinus morio* | Brown Jay |
-| Reinita Amarilla? | *Setophaga petechia* | Yellow Warbler |
-| Reinita Verdilla? | *Oreothlypis peregrina* | Tennessee Warbler |
-| Saltator Cabecinegro? | *Saltator atriceps* | Black-headed Saltator |
-| Soterrey Chicopiojo | *Campylorhynchus rufinucha* | Rufous-naped Wren |
-| Sotorrey Chinchirigüi | *Cantorchilus modestus* | Cabanis's Wren |
-| Tirano Tropical | *Tyrannus melancholicus* | Tropical Kingbird |
-| Tordo Cantor | *Dives dives* | Melodious Blackbird |
-| Tortolita Común | *Columbina passerina* | Common Ground-Dove |
-| Viudita | *Thraupis episcopus* | Blue-gray Tanager |
-| Zanate | *Quiscalus mexicanus* | Great-tailed Grackle |
-| Zopilote Cabecirrojo | *Cathartes aura* | Turkey Vulture |
-| Zopilote Negro | *Coragyps atratus* | Black Vulture |
+| Español                  | Científico                  | Inglés                    |
+| ------------------------ | --------------------------- | ------------------------- |
+| Bienteveo Grande         | _Pitangus sulphuratus_      | Great Kiskadee            |
+| Cacique veranero         | _Icterus galbula_           | Baltimore Oriole          |
+| Caracara Cargahuesos     | _Caracara cheriway_         | Crested Caracara          |
+| Carpintero de Hoffman    | _Melanerpes hoffmannii_     | Hoffmann's Woodpecker     |
+| Colibrí Rabirrufo        | _Amazilia tzacatl_          | Rufous-tailed Hummingbird |
+| Comemaíz                 | _Zonotrichia capensis_      | Rufous-collared Sparrow   |
+| Espatulilla Común        | _Todirostrum cinereum_      | Common Tody-Flycatcher    |
+| Gavilán Chapulinero?     | _Rupornis magnirostris_     | Roadside Hawk             |
+| Gavilán Gris             | _Buteo plagiatus_           | Gray Hawk                 |
+| Mosquero Cejiblanco      | _Myiozetetes similis_       | Social Flycatcher         |
+| Pájaro-imitador Tropical | _Mimus gilvus_              | Tropical Mockingbird      |
+| Paloma Aliblanca         | _Zenaida asiatica_          | White-winged Dove         |
+| Paloma Piquirroja        | _Patagioenas flavirostris_  | Red-billed Pigeon         |
+| Perico Frentirrojo       | _Psittacara finschi_        | Crimson-fronted Parakeet  |
+| Piapia                   | _Psilorhinus morio_         | Brown Jay                 |
+| Reinita Amarilla?        | _Setophaga petechia_        | Yellow Warbler            |
+| Reinita Verdilla?        | _Oreothlypis peregrina_     | Tennessee Warbler         |
+| Saltator Cabecinegro?    | _Saltator atriceps_         | Black-headed Saltator     |
+| Soterrey Chicopiojo      | _Campylorhynchus rufinucha_ | Rufous-naped Wren         |
+| Sotorrey Chinchirigüi    | _Cantorchilus modestus_     | Cabanis's Wren            |
+| Tirano Tropical          | _Tyrannus melancholicus_    | Tropical Kingbird         |
+| Tordo Cantor             | _Dives dives_               | Melodious Blackbird       |
+| Tortolita Común          | _Columbina passerina_       | Common Ground-Dove        |
+| Viudita                  | _Thraupis episcopus_        | Blue-gray Tanager         |
+| Zanate                   | _Quiscalus mexicanus_       | Great-tailed Grackle      |
+| Zopilote Cabecirrojo     | _Cathartes aura_            | Turkey Vulture            |
+| Zopilote Negro           | _Coragyps atratus_          | Black Vulture             |
